@@ -84,9 +84,9 @@ export function Footer() {
               </p>
             </div>
             <p className="text-sm text-primary-foreground/75 mb-4">
-              Founded by Wulaimot Akindele, MSN, APRN, PMHNP. Providing
-              compassionate, evidence-based psychiatric care with
-              personalized treatment plans.
+              Founded by Wulaimot Akindele, MSN, APRN, PMHNP — psychiatric
+              care built around the person in front of her, delivered
+              entirely by secure video visit.
             </p>
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5">
               <PulseDot />

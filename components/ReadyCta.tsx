@@ -32,10 +32,10 @@ export function ReadyCta() {
             </span>
           </div>
           <p className="font-display text-xl md:text-2xl font-semibold mb-1">
-            Begin your healing journey today
+            Ready to talk to someone?
           </p>
           <p className="text-sm text-muted-foreground">
-            Book a confidential consultation with your provider in minutes.
+            Book a confidential consultation in minutes — no referral needed.
           </p>
         </div>
 

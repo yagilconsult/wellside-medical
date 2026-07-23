@@ -41,37 +41,37 @@ const services = [
     icon: Brain,
     title: "Individual Therapy",
     description:
-      "One-on-one sessions tailored to your needs, focused on personal growth and lasting mental wellness.",
+      "Regular sessions built around what you're actually dealing with — not a one-size-fits-all treatment plan.",
   },
   {
     icon: Users,
     title: "Family Therapy",
     description:
-      "Strengthen family bonds and build healthier communication through collaborative, therapeutic support.",
+      "A space for families to work through conflict, transitions, or communication that's broken down.",
   },
   {
     icon: Heart,
     title: "Couples Counseling",
     description:
-      "Evidence-based techniques to help you and your partner communicate, connect, and grow together.",
+      "Structured support for couples navigating conflict, trust, or just feeling disconnected from each other.",
   },
   {
     icon: Stethoscope,
     title: "Psychiatric Evaluation",
     description:
-      "Comprehensive mental health assessments and medication management from a licensed provider.",
+      "A thorough clinical assessment to understand what's going on, and whether medication could help.",
   },
   {
     icon: MessageCircle,
     title: "Group Therapy",
     description:
-      "Connect with others facing similar challenges in a supportive, professionally guided setting.",
+      "Small, therapist-led groups for people working through similar experiences together.",
   },
   {
     icon: LifeBuoy,
-    title: "Crisis Intervention",
+    title: "Crisis Support",
     description:
-      "Urgent guidance and support during acute mental health crises, with a clear path to immediate care.",
+      "If things feel urgent, we'll help you get stabilized and pointed toward the right level of care fast.",
   },
 ];
 
@@ -80,25 +80,25 @@ const whyChoose = [
     icon: Award,
     title: "Board-Certified PMHNP",
     description:
-      "Led by Wulaimot Akindele, a board-certified Psychiatric Mental Health Nurse Practitioner with advanced training in psychiatric care and medication management.",
+      "Wulaimot holds advanced training in psychiatric evaluation and medication management, and keeps her clinical knowledge current through ongoing education.",
   },
   {
     icon: ShieldCheck,
     title: "Confidential & Safe",
     description:
-      "We hold ourselves to the highest privacy standards and create a safe, judgment-free space for healing.",
+      "What you share stays between you and your provider. No judgment, no exceptions.",
   },
   {
     icon: Clock,
-    title: "Virtual Telehealth Convenience",
+    title: "Care That Fits Your Schedule",
     description:
-      "Every appointment is conducted virtually through a secure platform, with flexible scheduling that fits your life.",
+      "Appointments happen over secure video, with scheduling that actually works around your day.",
   },
   {
     icon: CheckCircle2,
     title: "Insurance Accepted",
     description:
-      "We accept most major insurance plans and offer transparent, affordable self-pay options.",
+      "Most major insurance plans are accepted, and self-pay pricing is upfront — no surprise bills.",
   },
 ];
 
@@ -126,11 +126,11 @@ const faqs = [
 ];
 
 const trustBadges = [
-  { icon: FileCheck, label: "Licensed U.S. behavioral health providers" },
-  { icon: Lock, label: "Fully HIPAA-conscious & secure" },
+  { icon: FileCheck, label: "Licensed, PMHNP-led psychiatric care" },
+  { icon: Lock, label: "Secure, HIPAA-conscious platform" },
   { icon: CalendarClock, label: "Same-day & next-day appointments" },
   { icon: BadgeDollarSign, label: "Transparent pricing, no hidden fees" },
-  { icon: MapPinned, label: "Proudly serving patients nationwide" },
+  { icon: MapPinned, label: "Serving patients throughout the state" },
 ];
 
 const telehealthFeatures = [
@@ -142,7 +142,7 @@ const telehealthFeatures = [
   {
     icon: ShieldCheck,
     title: "Private & protected",
-    description: "Your health information is secured to HIPAA standards.",
+    description: "Your records and conversations are protected under HIPAA, always.",
   },
   {
     icon: MousePointerClick,
@@ -151,8 +151,8 @@ const telehealthFeatures = [
   },
   {
     icon: Wallet,
-    title: "Value-driven care",
-    description: "Clear, upfront costs whether you use insurance or self-pay.",
+    title: "Straightforward pricing",
+    description: "Clear, upfront costs whether you use insurance or pay out of pocket.",
   },
 ];
 
@@ -240,7 +240,7 @@ export default function HomePage() {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
             </span>
             <span className="text-xs font-medium tracking-wide uppercase">
-              Virtual telehealth services · Compassionate care
+              Virtual psychiatric care · Now accepting new patients
             </span>
           </motion.div>
 
@@ -292,7 +292,7 @@ export default function HomePage() {
           >
             {[
               { title: "Board", subtitle: "Certified PMHNP" },
-              { title: "Holistic", subtitle: "Patient-Centered Care" },
+              { title: "1:1", subtitle: "Personalized Care" },
               { title: "All Ages", subtitle: "Adolescents & Adults" },
             ].map((item) => (
               <div key={item.title} className="text-center">
@@ -322,7 +322,7 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="font-display text-xl md:text-2xl font-semibold text-center mb-10"
         >
-          Trusted care you can count on
+          What to expect when you book with us
         </motion.h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
           {trustBadges.map((badge, i) => (
@@ -365,8 +365,8 @@ export default function HomePage() {
           Comprehensive Mental Health Services
         </motion.h2>
         <motion.p variants={revealItem} className="text-muted-foreground mb-12 max-w-2xl mx-auto">
-          We offer a full range of evidence-based mental health services
-          designed to support your journey toward wellness.
+          From a single consultation to ongoing care, every service is
+          delivered by video visit with the same provider each time.
         </motion.p>
         <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
           {services.map((service, i) => (
@@ -437,23 +437,21 @@ export default function HomePage() {
               MSN, APRN, PMHNP
             </motion.p>
             <motion.p variants={revealItem} className="text-muted-foreground mb-4">
-              Wulaimot Akindele is a board-certified Psychiatric Mental Health
-              Nurse Practitioner and the founder of WellSide Behavioral
-              Health. She brings extensive expertise in providing
-              compassionate, evidence-based psychiatric care to adolescents
-              and adults.
+              Wulaimot Akindele is a board-certified Psychiatric Mental
+              Health Nurse Practitioner and the founder of WellSide
+              Behavioral Health. She works with adolescents and adults on
+              the full range of what brings people to therapy — from a
+              specific diagnosis to simply not feeling like themselves
+              lately.
             </motion.p>
             <motion.p variants={revealItem} className="text-muted-foreground mb-4">
-              Wulaimot specializes in psychiatric evaluations and medication
-              management for a wide range of conditions including anxiety
-              disorders, depression, ADHD, PTSD, bipolar disorder, and mood
-              regulation challenges.
+              Her practice focuses on psychiatric evaluations and medication
+              management for anxiety, depression, ADHD, PTSD, bipolar
+              disorder, and other mood-related concerns.
             </motion.p>
             <motion.p variants={revealItem} className="text-muted-foreground mb-8">
-              At WellSide Behavioral Health, Wulaimot is committed to
-              fostering a supportive, respectful environment where every
-              patient feels heard, understood, and valued on their journey to
-              mental health.
+              She built WellSide around one goal: make sure every patient
+              feels heard in the room, not rushed through it.
             </motion.p>
             <motion.div variants={revealItem}>
               <Link href="/book">
@@ -588,10 +586,9 @@ export default function HomePage() {
             variants={revealItem}
             className="text-muted-foreground text-center max-w-2xl mx-auto mb-12"
           >
-            Founded by Wulaimot Akindele, MSN, APRN, PMHNP, we provide
-            exceptional psychiatric mental health care with compassion,
-            clinical expertise, and evidence-based approaches tailored to
-            your unique needs.
+            WellSide was founded by Wulaimot Akindele, a board-certified
+            Psychiatric Mental Health Nurse Practitioner, on a simple idea:
+            psychiatric care should feel personal, not clinical.
           </motion.p>
           <div className="grid gap-5 sm:grid-cols-2">
             {whyChoose.map((item) => (
@@ -631,8 +628,7 @@ export default function HomePage() {
             Our Approach to Care
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            At WellSide Behavioral Health, we believe in comprehensive,
-            patient-centered psychiatric care.
+            Every treatment plan starts with listening, not a checklist.
           </p>
         </motion.div>
 
@@ -711,8 +707,8 @@ export default function HomePage() {
           Use your insurance or pay privately
         </h2>
         <p className="text-muted-foreground mb-8">
-          We verify your coverage before your first appointment and give you
-          an estimated copay in advance, with secure billing throughout.
+          We check your coverage before your first appointment and tell you
+          your estimated copay upfront — no guessing, no surprise bills.
         </p>
         <Link href="/book">
           <Button size="lg" variant="secondary">
