@@ -22,7 +22,7 @@ export function HeroPhotoBackground() {
           src="/images/hero-consultation.jpg"
           alt=""
           onError={() => setErrored(true)}
-          className="h-full w-full object-cover object-[center_8%] sm:object-[center_12%]"
+          className="h-full w-full object-cover object-[65%_22%] sm:object-[60%_25%]"
         />
       )}
       {errored && <HeroVideoCallScene />}
@@ -38,8 +38,20 @@ export function HeroPhotoBackground() {
         </span>
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/25" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
+      <div
+        className={
+          errored
+            ? "absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/10"
+            : "absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/25"
+        }
+      />
+      <div
+        className={
+          errored
+            ? "absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25"
+            : "absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40"
+        }
+      />
     </div>
   );
 }
