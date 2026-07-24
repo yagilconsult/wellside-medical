@@ -16,6 +16,7 @@ import {
   Wallet,
   ClipboardCheck,
   CheckCircle2,
+  Plus,
 } from "lucide-react";
 import { PortalSidebar, PortalNavItem } from "@/components/PortalSidebar";
 import { PortalTopBar } from "@/components/PortalTopBar";
@@ -238,6 +239,17 @@ export function PatientPortalClient({
                       value={consentsComplete ? "Complete" : "Action needed"}
                     />
                   </motion.div>
+                  <Card className="p-4 flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Ready for your next visit?
+                    </p>
+                    <Link href="/portal/book">
+                      <Button size="sm">
+                        <Plus size={14} />
+                        Book another appointment
+                      </Button>
+                    </Link>
+                  </Card>
                   {!consentsComplete && (
                     <SoftCard className="p-4 flex items-center justify-between">
                       <p className="text-sm">
@@ -274,6 +286,14 @@ export function PatientPortalClient({
 
               {active === "appointments" && (
                 <div className="space-y-6">
+                  <div className="flex justify-end">
+                    <Link href="/portal/book">
+                      <Button size="sm">
+                        <Plus size={14} />
+                        Book another appointment
+                      </Button>
+                    </Link>
+                  </div>
                   <div>
                     <p className="font-medium text-sm mb-2">Upcoming</p>
                     {appointments

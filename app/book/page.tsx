@@ -13,6 +13,7 @@ import { SoftCard } from "@/components/ui/Card";
 import { BookingStepper, StepDef } from "@/components/BookingStepper";
 import { cn } from "@/lib/utils";
 import { createAppointmentAction, updateInsuranceAction } from "@/lib/actions";
+import { estimateCost } from "@/lib/pricing";
 
 const ALL_STEPS: (StepDef & { conditional?: boolean })[] = [
   { key: "details", label: "Details" },
@@ -21,12 +22,6 @@ const ALL_STEPS: (StepDef & { conditional?: boolean })[] = [
   { key: "estimate", label: "Estimate" },
   { key: "account", label: "Account" },
 ];
-
-const APPOINTMENT_PRICING: Record<string, number> = {
-  "Initial evaluation (60 min)": 200,
-  "Follow-up (30 min)": 120,
-  "Medication management (30 min)": 140,
-};
 
 const slideVariants = {
   enter: (direction: number) => ({ x: direction > 0 ? 40 : -40, opacity: 0 }),
@@ -69,7 +64,7 @@ export default function BookingFlowPage() {
   );
   const currentKey = steps[stepIndex]?.key ?? steps[steps.length - 1].key;
   const isLast = stepIndex === steps.length - 1;
-  const sessionFee = APPOINTMENT_PRICING[appt.type] ?? 150;
+  const { sessionFee, estimatedCoverage, estimatedCopay } = estimateCost(appt.type);
 
   const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
@@ -91,8 +86,6 @@ export default function BookingFlowPage() {
   };
 
   const canContinue = stepIsValid[currentKey] ?? true;
-  const estimatedCoverage = Math.round(sessionFee * 0.8);
-  const estimatedCopay = sessionFee - estimatedCoverage;
 
   function goTo(newIndex: number, dir: number) {
     setStepIndex([Math.max(0, Math.min(steps.length - 1, newIndex)), dir]);
@@ -476,7 +469,20 @@ export default function BookingFlowPage() {
                   minLength={8}
                 />
               </Field>
-              {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
+              {error && (
+                <div className="mt-3">
+                  <p className="text-sm text-red-600">{error}</p>
+                  {error.toLowerCase().includes("already exists") && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Already have an account?{" "}
+                      <Link href="/login" className="text-primary underline">
+                        Sign in
+                      </Link>{" "}
+                      to book your next appointment in a couple of clicks.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </motion.div>
