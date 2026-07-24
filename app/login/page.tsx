@@ -82,6 +82,11 @@ export default function LoginPage() {
                 placeholder="••••••••"
               />
             </Field>
+            <div className="text-right -mt-2">
+              <Link href="/forgot-password" className="text-xs text-primary underline">
+                Forgot password?
+              </Link>
+            </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 

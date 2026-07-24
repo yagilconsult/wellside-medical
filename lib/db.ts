@@ -300,3 +300,48 @@ export async function upsertConsent(
   `;
   return rows[0];
 }
+
+// ---------- Password reset ----------
+
+export interface PasswordResetToken {
+  id: string;
+  userId: string;
+  token: string;
+  expiresAt: string;
+  usedAt: string | null;
+  createdAt: string;
+}
+
+function randomToken() {
+  const bytes = Array.from({ length: 32 }, () => Math.floor(Math.random() * 256));
+  return Buffer.from(bytes).toString("base64url");
+}
+
+export async function createPasswordResetToken(userId: string): Promise<PasswordResetToken> {
+  const token = randomToken();
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 30).toISOString(); // 30 minutes
+  const rows = await sql<PasswordResetToken[]>`
+    INSERT INTO password_reset_tokens (id, user_id, token, expires_at)
+    VALUES (${id()}, ${userId}, ${token}, ${expiresAt})
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function findValidPasswordResetToken(
+  token: string
+): Promise<PasswordResetToken | undefined> {
+  const rows = await sql<PasswordResetToken[]>`
+    SELECT * FROM password_reset_tokens
+    WHERE token = ${token} AND used_at IS NULL AND expires_at > now()
+  `;
+  return rows[0];
+}
+
+export async function markPasswordResetTokenUsed(tokenId: string): Promise<void> {
+  await sql`UPDATE password_reset_tokens SET used_at = now() WHERE id = ${tokenId}`;
+}
+
+export async function updateUserPassword(userId: string, passwordHash: string): Promise<void> {
+  await sql`UPDATE users SET password_hash = ${passwordHash} WHERE id = ${userId}`;
+}
