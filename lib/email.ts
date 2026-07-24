@@ -97,3 +97,55 @@ export async function sendAppointmentConfirmationEmail(
     `)
   );
 }
+
+export async function sendAppointmentConfirmedByProviderEmail(
+  to: string,
+  patientName: string,
+  appointmentType: string,
+  date: string,
+  time: string
+) {
+  return sendEmail(
+    to,
+    "Wulaimot has confirmed your appointment",
+    wrapper(`
+      <p style="font-size: 15px; color: #1a2e2a;">Hi ${patientName},</p>
+      <p style="font-size: 15px; color: #1a2e2a;">
+        Your appointment has been reviewed and confirmed:
+      </p>
+      <p style="font-size: 15px; color: #1a2e2a; background: #eef7f4; padding: 12px 16px; border-radius: 8px;">
+        <strong>${appointmentType}</strong><br />
+        ${date} at ${time}
+      </p>
+      <p style="font-size: 15px; color: #1a2e2a;">
+        We'll see you then. You can view this appointment anytime from your patient portal.
+      </p>
+    `)
+  );
+}
+
+export async function sendAppointmentCancelledEmail(
+  to: string,
+  patientName: string,
+  appointmentType: string,
+  date: string,
+  time: string
+) {
+  return sendEmail(
+    to,
+    "Your appointment has been cancelled",
+    wrapper(`
+      <p style="font-size: 15px; color: #1a2e2a;">Hi ${patientName},</p>
+      <p style="font-size: 15px; color: #1a2e2a;">
+        This appointment has been cancelled:
+      </p>
+      <p style="font-size: 15px; color: #1a2e2a; background: #eef7f4; padding: 12px 16px; border-radius: 8px;">
+        <strong>${appointmentType}</strong><br />
+        ${date} at ${time}
+      </p>
+      <p style="font-size: 15px; color: #1a2e2a;">
+        If this wasn't expected, or you'd like to rebook, visit your patient portal.
+      </p>
+    `)
+  );
+}

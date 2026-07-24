@@ -4,6 +4,11 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import * as db from "@/lib/db";
+import {
+  sendAppointmentConfirmationEmail,
+  sendAppointmentConfirmedByProviderEmail,
+  sendAppointmentCancelledEmail,
+} from "@/lib/email";
 
 async function requireSession() {
   const session = await getServerSession(authOptions);
@@ -36,6 +41,17 @@ export async function createAppointmentAction(input: {
   await db.createAppointment({ ...input, status: "REQUESTED" });
   revalidatePath("/portal");
   revalidatePath("/admin");
+
+  const patient = await db.findUserById(input.patientId);
+  if (patient) {
+    await sendAppointmentConfirmationEmail(
+      patient.email,
+      patient.name,
+      input.type,
+      input.date,
+      input.time
+    );
+  }
 }
 
 export async function updateAppointmentStatusAction(
@@ -43,9 +59,32 @@ export async function updateAppointmentStatusAction(
   status: db.AppointmentStatus
 ) {
   await requireSession();
-  await db.updateAppointmentStatus(appointmentId, status);
+  const appt = await db.updateAppointmentStatus(appointmentId, status);
   revalidatePath("/portal");
   revalidatePath("/admin");
+
+  if (appt && (status === "CONFIRMED" || status === "CANCELLED")) {
+    const patient = await db.findUserById(appt.patientId);
+    if (patient) {
+      if (status === "CONFIRMED") {
+        await sendAppointmentConfirmedByProviderEmail(
+          patient.email,
+          patient.name,
+          appt.type,
+          appt.date,
+          appt.time
+        );
+      } else {
+        await sendAppointmentCancelledEmail(
+          patient.email,
+          patient.name,
+          appt.type,
+          appt.date,
+          appt.time
+        );
+      }
+    }
+  }
 }
 
 // ---------- Messages ----------
