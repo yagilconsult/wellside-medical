@@ -30,7 +30,7 @@ export function HeartbeatDivider({ className = "" }: { className?: string }) {
       <motion.div
         className="flex h-full"
         style={{ width: "200%" }}
-        animate={{ x: ["-50%", "0%"] }}
+        animate={{ transform: ["translateX(-50%)", "translateX(0%)"] }}
         transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
       >
         <svg viewBox="0 0 1200 80" preserveAspectRatio="none" className="w-1/2 h-full text-primary/40 shrink-0">

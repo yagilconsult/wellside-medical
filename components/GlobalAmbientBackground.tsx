@@ -17,17 +17,17 @@ export function GlobalAmbientBackground() {
         }}
       />
       <motion.div
-        animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0] }}
+        animate={{ transform: ["translate(0px, 0px)", "translate(40px, -30px)", "translate(-20px, 20px)", "translate(0px, 0px)"] }}
         transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
         className="absolute top-[5%] left-[-10%] h-[26rem] w-[26rem] rounded-full bg-primary/10 blur-[100px]"
       />
       <motion.div
-        animate={{ x: [0, -30, 20, 0], y: [0, 25, -20, 0] }}
+        animate={{ transform: ["translate(0px, 0px)", "translate(-30px, 25px)", "translate(20px, -20px)", "translate(0px, 0px)"] }}
         transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
         className="absolute top-[40%] right-[-12%] h-[24rem] w-[24rem] rounded-full bg-teal-400/10 blur-[100px]"
       />
       <motion.div
-        animate={{ x: [0, 25, -15, 0], y: [0, -20, 15, 0] }}
+        animate={{ transform: ["translate(0px, 0px)", "translate(25px, -20px)", "translate(-15px, 15px)", "translate(0px, 0px)"] }}
         transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
         className="absolute bottom-[-8%] left-[20%] h-[22rem] w-[22rem] rounded-full bg-emerald-300/10 blur-[100px]"
       />

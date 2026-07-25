@@ -18,12 +18,12 @@ export function HeroVideoCallScene() {
     >
       <defs>
         <linearGradient id="heroSceneBg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="hsl(172 55% 16%)" />
-          <stop offset="50%" stopColor="hsl(165 45% 22%)" />
-          <stop offset="100%" stopColor="hsl(178 40% 20%)" />
+          <stop offset="0%" stopColor="hsl(172 55% 42%)" />
+          <stop offset="50%" stopColor="hsl(165 50% 48%)" />
+          <stop offset="100%" stopColor="hsl(178 45% 44%)" />
         </linearGradient>
         <radialGradient id="heroSceneGlow" cx="50%" cy="30%" r="65%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.12" />
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.25" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </radialGradient>
       </defs>

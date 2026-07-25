@@ -41,7 +41,7 @@ const services = [
     icon: Brain,
     title: "Individual Therapy",
     description:
-      "Regular sessions built around what you're actually dealing with — not a one-size-fits-all treatment plan.",
+      "Regular sessions built around what you're actually dealing with, not a one-size-fits-all treatment plan.",
   },
   {
     icon: Users,
@@ -98,14 +98,14 @@ const whyChoose = [
     icon: CheckCircle2,
     title: "Insurance Accepted",
     description:
-      "Most major insurance plans are accepted, and self-pay pricing is upfront — no surprise bills.",
+      "Most major insurance plans are accepted, and self-pay pricing is upfront, with no surprise bills.",
   },
 ];
 
 const faqs = [
   {
     q: "How does telehealth work?",
-    a: "You'll meet with Wulaimot through a secure video visit from your phone, tablet, or computer — no in-person visit required.",
+    a: "You'll meet with Wulaimot through a secure video visit from your phone, tablet, or computer. No in-person visit required.",
   },
   {
     q: "Do you accept insurance?",
@@ -158,7 +158,7 @@ const telehealthFeatures = [
 
 const heroContainer = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
 };
 const heroItem = {
   hidden: { opacity: 0, y: 18 },
@@ -176,7 +176,7 @@ const heroWord = {
 
 const revealContainer = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.07 } },
 };
 const revealItem = {
   hidden: { opacity: 0, y: 24 },
@@ -427,7 +427,7 @@ export default function HomePage() {
           <motion.div
             variants={{
               hidden: {},
-              show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
+              show: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
             }}
           >
             <motion.h2 variants={revealItem} className="font-display text-2xl font-semibold mb-1">
@@ -440,7 +440,7 @@ export default function HomePage() {
               Wulaimot Akindele is a board-certified Psychiatric Mental
               Health Nurse Practitioner and the founder of WellSide
               Behavioral Health. She works with adolescents and adults on
-              the full range of what brings people to therapy — from a
+              the full range of what brings people to therapy, from a
               specific diagnosis to simply not feeling like themselves
               lately.
             </motion.p>
@@ -480,7 +480,7 @@ export default function HomePage() {
               See your provider from the comfort of home
             </h2>
             <p className="text-muted-foreground">
-              No commute, no waiting room — just a secure video visit when it
+              No commute, no waiting room. Just a secure video visit when it
               works for you.
             </p>
           </motion.div>
@@ -564,7 +564,7 @@ export default function HomePage() {
 
       <section className="relative bg-muted overflow-hidden">
         <motion.div
-          animate={{ x: [0, 20, 0], y: [0, -15, 0] }}
+          animate={{ transform: ["translate(0px, 0px)", "translate(20px, -15px)", "translate(0px, 0px)"] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
           className="pointer-events-none absolute -top-16 right-[-4rem] h-64 w-64 rounded-full bg-primary/10 blur-3xl"
           aria-hidden="true"
@@ -708,7 +708,7 @@ export default function HomePage() {
         </h2>
         <p className="text-muted-foreground mb-8">
           We check your coverage before your first appointment and tell you
-          your estimated copay upfront — no guessing, no surprise bills.
+          your estimated copay upfront, with no guessing and no surprise bills.
         </p>
         <Link href="/book">
           <Button size="lg" variant="secondary">

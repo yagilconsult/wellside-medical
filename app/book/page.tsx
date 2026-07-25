@@ -165,7 +165,7 @@ export default function BookingFlowPage() {
     return (
       <main className="mx-auto max-w-lg px-6 py-24 text-center">
         <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 18 }}
           className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-primary"
@@ -408,7 +408,7 @@ export default function BookingFlowPage() {
               <SoftCard className="p-6">
                 {usesInsurance && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ type: "spring", stiffness: 300, damping: 15 }}
                     className="flex items-center gap-2 text-primary font-medium text-sm mb-4"
@@ -449,7 +449,7 @@ export default function BookingFlowPage() {
               >
                 <UserPlus size={18} className="text-primary mt-0.5 shrink-0" />
                 <p className="text-sm text-accent-foreground">
-                  One last thing — we&apos;ll set up your secure{" "}
+                  One last thing: we&apos;ll set up your secure{" "}
                   <strong>client portal</strong> so you can manage
                   appointments, message your provider, and view records
                   anytime.

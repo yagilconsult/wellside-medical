@@ -158,8 +158,8 @@ export function PatientPortalClient({
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.94, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0, transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } }}
+              exit={{ opacity: 0, scale: 0.96, y: 6, transition: { duration: 0.12, ease: [0.4, 0, 1, 1] } }}
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-md rounded-2xl bg-card border border-border shadow-2xl p-6"
             >
@@ -276,7 +276,7 @@ export function PatientPortalClient({
                         ))
                       ) : (
                         <p className="text-sm text-muted-foreground">
-                          No completed visits yet — your history will appear here.
+                          No completed visits yet. Your history will appear here.
                         </p>
                       )}
                     </div>

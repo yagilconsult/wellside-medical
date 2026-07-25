@@ -30,7 +30,7 @@ const legalLinks = [
 
 const revealContainer = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.07 } },
 };
 const revealItem = {
   hidden: { opacity: 0, y: 24 },
@@ -50,12 +50,12 @@ export function Footer() {
       />
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <motion.div
-          animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+          animate={{ transform: ["translate(0px, 0px)", "translate(30px, -20px)", "translate(0px, 0px)"] }}
           transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-24 right-[-6rem] h-80 w-80 rounded-full bg-white/5 blur-3xl"
         />
         <motion.div
-          animate={{ x: [0, -25, 0], y: [0, 20, 0] }}
+          animate={{ transform: ["translate(0px, 0px)", "translate(-25px, 20px)", "translate(0px, 0px)"] }}
           transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-0 left-[-6rem] h-72 w-72 rounded-full bg-emerald-300/5 blur-3xl"
         />
@@ -84,7 +84,7 @@ export function Footer() {
               </p>
             </div>
             <p className="text-sm text-primary-foreground/75 mb-4">
-              Founded by Wulaimot Akindele, MSN, APRN, PMHNP — psychiatric
+              Founded by Wulaimot Akindele, MSN, APRN, PMHNP. Psychiatric
               care built around the person in front of her, delivered
               entirely by secure video visit.
             </p>

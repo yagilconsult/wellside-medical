@@ -46,7 +46,7 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Account created — please sign in.");
+      setError("Account created. Please sign in.");
       router.push("/login");
       return;
     }

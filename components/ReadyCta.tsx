@@ -35,7 +35,7 @@ export function ReadyCta() {
             Ready to talk to someone?
           </p>
           <p className="text-sm text-muted-foreground">
-            Book a confidential consultation in minutes — no referral needed.
+            Book a confidential consultation in minutes, no referral needed.
           </p>
         </div>
 

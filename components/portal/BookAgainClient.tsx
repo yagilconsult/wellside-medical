@@ -110,7 +110,7 @@ export function BookAgainClient({
     return (
       <main className="mx-auto max-w-lg px-6 py-24 text-center">
         <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 18 }}
           className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-primary"
@@ -135,7 +135,7 @@ export function BookAgainClient({
 
       <p className="font-display text-lg font-semibold mb-1">Book another appointment</p>
       <p className="text-sm text-muted-foreground mb-8">
-        We already have your details on file — just pick a time.
+        We already have your details on file, just pick a time.
       </p>
 
       <BookingStepper steps={steps} currentIndex={stepIndex} />
@@ -225,7 +225,7 @@ export function BookAgainClient({
             <div>
               <p className="font-medium mb-1">Insurance on file</p>
               <p className="text-xs text-muted-foreground mb-4">
-                Already up to date? Just continue — otherwise update it below.
+                Already up to date? Just continue, otherwise update it below.
               </p>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">

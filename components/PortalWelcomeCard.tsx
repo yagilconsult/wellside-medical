@@ -21,7 +21,7 @@ export function PortalWelcomeCard({
       className="relative overflow-hidden rounded-2xl bg-primary text-primary-foreground p-6 mb-6"
     >
       <motion.div
-        animate={{ x: [0, 20, 0], y: [0, -12, 0] }}
+        animate={{ transform: ["translate(0px, 0px)", "translate(20px, -12px)", "translate(0px, 0px)"] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         className="pointer-events-none absolute -top-16 right-[-3rem] h-52 w-52 rounded-full bg-white/10 blur-3xl"
         aria-hidden="true"

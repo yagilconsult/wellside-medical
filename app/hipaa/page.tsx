@@ -29,15 +29,15 @@ export default function HipaaNoticePage() {
         <p>We may use and disclose your PHI for purposes including:</p>
         <ul className="list-disc pl-5 space-y-1.5">
           <li>
-            <strong>Treatment</strong> — sharing information with your
+            <strong>Treatment</strong>: sharing information with your
             provider to deliver and coordinate your care.
           </li>
           <li>
-            <strong>Payment</strong> — sharing information with your
+            <strong>Payment</strong>: sharing information with your
             insurance provider to verify coverage and process claims.
           </li>
           <li>
-            <strong>Healthcare operations</strong> — using information for
+            <strong>Healthcare operations</strong>: using information for
             quality assessment, staff training, and administrative
             activities.
           </li>
@@ -92,7 +92,7 @@ export default function HipaaNoticePage() {
 
       <p className="text-xs text-muted-foreground/70 pt-4 border-t border-border">
         This page is placeholder content for a product prototype. A HIPAA
-        Notice of Privacy Practices is a legally significant document —
+        Notice of Privacy Practices is a legally significant document.
         before launch, this notice must be reviewed and finalized by
         qualified legal/compliance counsel to ensure it accurately reflects
         your actual practices and meets all federal and state requirements.
