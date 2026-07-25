@@ -68,6 +68,8 @@ export interface InsuranceInfo {
   memberId?: string;
   groupNumber?: string;
   status: InsuranceStatus;
+  cardFrontUrl?: string;
+  cardBackUrl?: string;
   updatedAt: string;
 }
 
@@ -215,8 +217,8 @@ export async function upsertInsurance(
   const existing = await getInsuranceForPatient(patientId);
   if (!existing) {
     const rows = await sql<InsuranceInfo[]>`
-      INSERT INTO insurance_info (id, patient_id, company, plan, member_id, group_number, status)
-      VALUES (${id()}, ${patientId}, ${patch.company ?? ""}, ${patch.plan ?? null}, ${patch.memberId ?? null}, ${patch.groupNumber ?? null}, ${patch.status ?? "PENDING"})
+      INSERT INTO insurance_info (id, patient_id, company, plan, member_id, group_number, status, card_front_url, card_back_url)
+      VALUES (${id()}, ${patientId}, ${patch.company ?? ""}, ${patch.plan ?? null}, ${patch.memberId ?? null}, ${patch.groupNumber ?? null}, ${patch.status ?? "PENDING"}, ${patch.cardFrontUrl ?? null}, ${patch.cardBackUrl ?? null})
       RETURNING *
     `;
     return rows[0];
@@ -228,6 +230,8 @@ export async function upsertInsurance(
       member_id = COALESCE(${patch.memberId ?? null}, member_id),
       group_number = COALESCE(${patch.groupNumber ?? null}, group_number),
       status = COALESCE(${patch.status ?? null}, status),
+      card_front_url = COALESCE(${patch.cardFrontUrl ?? null}, card_front_url),
+      card_back_url = COALESCE(${patch.cardBackUrl ?? null}, card_back_url),
       updated_at = now()
     WHERE patient_id = ${patientId}
     RETURNING *
@@ -344,4 +348,30 @@ export async function markPasswordResetTokenUsed(tokenId: string): Promise<void>
 
 export async function updateUserPassword(userId: string, passwordHash: string): Promise<void> {
   await sql`UPDATE users SET password_hash = ${passwordHash} WHERE id = ${userId}`;
+}
+
+// ---------- Account deletion (used for retiring demo/test accounts) ----------
+
+/**
+ * Permanently deletes a patient and every record that references them
+ * (messages, appointments, insurance, intake, consents, reset tokens).
+ * Deletes child records first to satisfy foreign key constraints.
+ * Only ever deletes users with role = 'PATIENT' — will not touch a
+ * provider account, even if called with one by mistake.
+ */
+export async function deletePatientCompletely(patientId: string): Promise<{ deleted: boolean; name?: string }> {
+  const user = await findUserById(patientId);
+  if (!user || user.role !== "PATIENT") {
+    return { deleted: false };
+  }
+
+  await sql`DELETE FROM messages WHERE thread_user_id = ${patientId} OR author_id = ${patientId}`;
+  await sql`DELETE FROM appointments WHERE patient_id = ${patientId}`;
+  await sql`DELETE FROM insurance_info WHERE patient_id = ${patientId}`;
+  await sql`DELETE FROM intake_forms WHERE patient_id = ${patientId}`;
+  await sql`DELETE FROM consent_forms WHERE patient_id = ${patientId}`;
+  await sql`DELETE FROM password_reset_tokens WHERE user_id = ${patientId}`;
+  await sql`DELETE FROM users WHERE id = ${patientId}`;
+
+  return { deleted: true, name: user.name };
 }

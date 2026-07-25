@@ -18,7 +18,34 @@ works.
 2. Copy the connection string it gives you (starts with `postgresql://`)
 3. Paste it into `.env` as `DATABASE_URL`
 
-### 2. Install, migrate, seed, run
+### 2. (Optional but recommended) Set up real email sending
+
+Password reset emails and appointment confirmations use
+[Resend](https://resend.com) — free for up to 3,000 emails/month.
+
+1. Sign up at [resend.com](https://resend.com)
+2. Create an API key (Dashboard → API Keys)
+3. Paste it into `.env` as `RESEND_API_KEY`
+
+Without this, the app still works — password reset requests are logged
+to your terminal instead of emailed, so you can copy the reset link from
+there during local development. Nothing breaks either way.
+
+### 3. (Optional but recommended) Set up real file storage
+
+Insurance card photo uploads use [Vercel Blob](https://vercel.com/storage/blob).
+
+1. In your Vercel dashboard → your project → **Storage** tab → **Create Database** → **Blob**
+2. Once created, Vercel gives you a `BLOB_READ_WRITE_TOKEN` — copy it
+3. Paste it into `.env` as `BLOB_READ_WRITE_TOKEN`
+
+Without this, uploads still work in local development — they just save to
+a local `public/uploads` folder instead (dev-only; this doesn't work in
+production, since Vercel's deployed filesystem is read-only). Once you
+deploy, make sure `BLOB_READ_WRITE_TOKEN` is also added to Vercel's
+Environment Variables, same as the other secrets.
+
+### 4. Install, migrate, seed, run
 
 ```bash
 npm install
@@ -48,6 +75,10 @@ Or register a brand new patient account through the real `/book` flow.
      placeholder): run `openssl rand -base64 32` locally and paste the
      result
    - `NEXTAUTH_URL` — your deployed URL, e.g. `https://your-app.vercel.app`
+   - `RESEND_API_KEY` — your Resend API key, so password reset and
+     confirmation emails actually send in production
+   - `BLOB_READ_WRITE_TOKEN` — your Vercel Blob token, so insurance card
+     uploads work in production
 4. Deploy
 5. Run the migration once against your production database (you can run
    `npm run db:migrate` locally with `DATABASE_URL` temporarily pointed
@@ -104,18 +135,40 @@ Route access is enforced by `middleware.ts` based on real session role
 - **Motion**: Framer Motion throughout, wrapped in a global
   `MotionConfig` that respects `prefers-reduced-motion`.
 
+## What's now real (as of this update)
+
+- **Password reset** — `/forgot-password` → emailed link → `/reset-password`,
+  backed by real time-limited tokens in the database.
+- **Transactional email** — via Resend: password resets, appointment
+  booking confirmations, provider-confirmed notices, and cancellation
+  notices all send real email.
+- **Returning-patient rebooking** — `/portal/book` lets an already
+  signed-in patient book another appointment without re-entering their
+  name, DOB, or password. The original guest `/book` flow is unchanged
+  for brand-new patients.
+- **Real insurance card uploads** — via Vercel Blob (with a local-disk
+  fallback for dev before Blob is configured). Wired into the patient
+  portal and the returning-patient booking flow. The admin portal shows
+  the actual uploaded photos, not just the typed-in data.
+- **Demo accounts are no longer publicly exposed** — the login page's
+  demo credential hint only renders in local development, never in a
+  production build. `npm run db:retire-demo-accounts` permanently
+  removes the seeded demo patients (and all their data) from the
+  database when you're ready, without touching the real provider account.
+
 ## Known limitations / next phase
 
 - **Insurance verification is manual by design right now** — the admin
   portal has "mark verified / reject" actions instead of an automated
   check. A real-time eligibility API (e.g. Stedi, pVerify) was scoped and
   is ready to wire in once a vendor is chosen and a BAA is signed.
-- **File uploads (insurance cards) are visual-only** — the dropzone UI
-  works but nothing is persisted to storage yet. Would need something
-  like Vercel Blob or S3 before going live with real uploads.
 - **No real video visit provider wired up** (e.g. Twilio Video, Daily.co)
   — appointments are scheduled but the actual video session isn't
   implemented.
+- **The provider account's password should be rotated to something real**
+  once demo accounts are retired — use "Forgot password" on the login
+  page for `provider@wellsidebh.com` rather than leaving it on the
+  shared demo password.
 - **Legal pages are placeholder content.** Privacy Policy, Terms of
   Service, and especially the HIPAA Notice of Privacy Practices need
   review by qualified legal/compliance counsel before real patients see

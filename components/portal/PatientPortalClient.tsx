@@ -102,6 +102,8 @@ export function PatientPortalClient({
   const [active, setActive] = useState("dashboard");
   const [profileOpen, setProfileOpen] = useState(false);
   const [insuranceUploadOpen, setInsuranceUploadOpen] = useState(false);
+  const [uploadCardFrontUrl, setUploadCardFrontUrl] = useState(insurance?.cardFrontUrl);
+  const [uploadCardBackUrl, setUploadCardBackUrl] = useState(insurance?.cardBackUrl);
   const { message, showToast } = useToast();
 
   const initials = user.name.split(" ").map((n) => n[0]).join("");
@@ -165,8 +167,18 @@ export function PatientPortalClient({
             >
               <p className="font-medium mb-4">Update insurance card</p>
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <FileUpload id="updCardFront" label="Front" />
-                <FileUpload id="updCardBack" label="Back" />
+                <FileUpload
+                  id="updCardFront"
+                  label="Front"
+                  existingUrl={uploadCardFrontUrl}
+                  onUploadComplete={setUploadCardFrontUrl}
+                />
+                <FileUpload
+                  id="updCardBack"
+                  label="Back"
+                  existingUrl={uploadCardBackUrl}
+                  onUploadComplete={setUploadCardBackUrl}
+                />
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="secondary" onClick={() => setInsuranceUploadOpen(false)}>
@@ -174,7 +186,11 @@ export function PatientPortalClient({
                 </Button>
                 <Button
                   onClick={async () => {
-                    await updateInsuranceAction(user.id, { status: "PENDING" });
+                    await updateInsuranceAction(user.id, {
+                      status: "PENDING",
+                      cardFrontUrl: uploadCardFrontUrl,
+                      cardBackUrl: uploadCardBackUrl,
+                    });
                     setInsuranceUploadOpen(false);
                     showToast("Insurance card submitted for review");
                     router.refresh();

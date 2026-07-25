@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, ShieldCheck, Wallet, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Field } from "@/components/ui/Input";
-import { FileUpload } from "@/components/ui/FileUpload";
 import { SoftCard } from "@/components/ui/Card";
 import { BookingStepper, StepDef } from "@/components/BookingStepper";
 import { cn } from "@/lib/utils";
@@ -394,9 +393,12 @@ export default function BookingFlowPage() {
                     />
                   </Field>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FileUpload id="cardFront" label="Insurance card front" optional />
-                  <FileUpload id="cardBack" label="Insurance card back" optional />
+                <div className="flex items-start gap-2 rounded-lg bg-accent p-3">
+                  <ShieldCheck size={15} className="text-primary mt-0.5 shrink-0" />
+                  <p className="text-xs text-accent-foreground">
+                    You can upload a photo of your insurance card from your
+                    patient portal right after you sign up below.
+                  </p>
                 </div>
               </div>
             </div>

@@ -142,7 +142,7 @@ export function PatientDetailClient({
                   <Row label="Status" tone="success" value={insurance.status} />
                   {insurance.memberId && (
                     <div className="flex justify-between items-center py-3 text-sm">
-                      <span className="text-muted-foreground">Uploaded card</span>
+                      <span className="text-muted-foreground">Card details</span>
                       <button className="text-sm underline" onClick={() => setShowCard(true)}>
                         View
                       </button>
@@ -152,6 +152,47 @@ export function PatientDetailClient({
               ) : (
                 <p className="text-sm text-muted-foreground mb-4">No insurance on file.</p>
               )}
+
+              {insurance && (insurance.cardFrontUrl || insurance.cardBackUrl) && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2">Uploaded card photos</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {insurance.cardFrontUrl && (
+                      <a
+                        href={insurance.cardFrontUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block rounded-lg border border-border overflow-hidden hover:border-primary transition-colors"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={insurance.cardFrontUrl}
+                          alt="Insurance card front, uploaded by patient"
+                          className="w-full h-24 object-cover"
+                        />
+                        <p className="text-xs text-center py-1.5 text-muted-foreground">Front</p>
+                      </a>
+                    )}
+                    {insurance.cardBackUrl && (
+                      <a
+                        href={insurance.cardBackUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block rounded-lg border border-border overflow-hidden hover:border-primary transition-colors"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={insurance.cardBackUrl}
+                          alt="Insurance card back, uploaded by patient"
+                          className="w-full h-24 object-cover"
+                        />
+                        <p className="text-xs text-center py-1.5 text-muted-foreground">Back</p>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {insurance && insurance.status !== "VERIFIED" && (
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => setInsuranceStatus("VERIFIED")}>

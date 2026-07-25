@@ -52,6 +52,8 @@ export function BookAgainClient({
     memberId: existingInsurance?.memberId ?? "",
     groupNumber: existingInsurance?.groupNumber ?? "",
   });
+  const [cardFrontUrl, setCardFrontUrl] = useState(existingInsurance?.cardFrontUrl);
+  const [cardBackUrl, setCardBackUrl] = useState(existingInsurance?.cardBackUrl);
 
   const steps = useMemo(
     () => ALL_STEPS.filter((s) => !s.conditional || usesInsurance),
@@ -92,6 +94,8 @@ export function BookAgainClient({
         plan: insuranceForm.plan,
         memberId: insuranceForm.memberId,
         groupNumber: insuranceForm.groupNumber,
+        cardFrontUrl,
+        cardBackUrl,
       });
     }
 
@@ -261,8 +265,20 @@ export function BookAgainClient({
                   </Field>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <FileUpload id="cardFront" label="Updated card front" optional />
-                  <FileUpload id="cardBack" label="Updated card back" optional />
+                  <FileUpload
+                    id="cardFront"
+                    label="Updated card front"
+                    optional
+                    existingUrl={cardFrontUrl}
+                    onUploadComplete={setCardFrontUrl}
+                  />
+                  <FileUpload
+                    id="cardBack"
+                    label="Updated card back"
+                    optional
+                    existingUrl={cardBackUrl}
+                    onUploadComplete={setCardBackUrl}
+                  />
                 </div>
               </div>
             </div>

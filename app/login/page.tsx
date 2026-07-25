@@ -103,14 +103,16 @@ export default function LoginPage() {
           </p>
         </Card>
 
-        <div className="mt-5 flex items-start gap-2 rounded-lg bg-accent p-4">
-          <Info size={15} className="text-primary mt-0.5 shrink-0" />
-          <div className="text-xs text-accent-foreground leading-relaxed">
-            <p className="font-medium mb-1">Demo accounts (local dev only)</p>
-            <p>Patient: jordan@example.com / password123</p>
-            <p>Provider: provider@wellsidebh.com / password123</p>
+        {process.env.NODE_ENV !== "production" && (
+          <div className="mt-5 flex items-start gap-2 rounded-lg bg-accent p-4">
+            <Info size={15} className="text-primary mt-0.5 shrink-0" />
+            <div className="text-xs text-accent-foreground leading-relaxed">
+              <p className="font-medium mb-1">Demo accounts (local dev only)</p>
+              <p>Patient: jordan@example.com / password123</p>
+              <p>Provider: provider@wellsidebh.com / password123</p>
+            </div>
           </div>
-        </div>
+        )}
       </motion.div>
     </main>
   );

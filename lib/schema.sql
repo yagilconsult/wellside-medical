@@ -44,8 +44,13 @@ CREATE TABLE IF NOT EXISTS insurance_info (
   group_number TEXT,
   status       TEXT NOT NULL DEFAULT 'PENDING'
                  CHECK (status IN ('PENDING','VERIFIED','REJECTED','MANUAL_REVIEW')),
+  card_front_url TEXT,
+  card_back_url  TEXT,
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE insurance_info ADD COLUMN IF NOT EXISTS card_front_url TEXT;
+ALTER TABLE insurance_info ADD COLUMN IF NOT EXISTS card_back_url TEXT;
 
 CREATE TABLE IF NOT EXISTS intake_forms (
   id                       TEXT PRIMARY KEY,
