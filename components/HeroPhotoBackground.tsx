@@ -22,7 +22,7 @@ export function HeroPhotoBackground() {
           src="/images/hero-consultation.jpg"
           alt=""
           onError={() => setErrored(true)}
-          className="h-full w-full object-cover object-[65%_22%] sm:object-[60%_25%]"
+          className="h-full w-full object-cover object-[22%_28%] sm:object-[35%_28%]"
         />
       )}
       {errored && <HeroVideoCallScene />}
