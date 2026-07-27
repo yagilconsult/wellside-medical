@@ -45,10 +45,14 @@ export async function POST(req: Request) {
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const { put } = await import("@vercel/blob");
     const blob = await put(filename, file, {
-      access: "public",
+      access: "private",
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
-    return NextResponse.json({ url: blob.url });
+    // Private blobs aren't reachable via a plain public URL — route
+    // views through our own authenticated endpoint instead.
+    return NextResponse.json({
+      url: `/api/insurance-card?path=${encodeURIComponent(blob.pathname)}`,
+    });
   }
 
   // Local-dev fallback — no Blob token configured yet.
