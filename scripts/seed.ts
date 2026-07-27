@@ -6,6 +6,7 @@ import {
   createAppointment,
   upsertInsurance,
   createMessage,
+  setAvailabilityRule,
 } from "../lib/db";
 
 async function main() {
@@ -115,6 +116,16 @@ async function main() {
     authorId: maya.id,
     text: "Hi, I just uploaded my new insurance card — can you confirm it went through?",
   });
+
+  // Default office hours: Monday–Friday, 9am–5pm. Wulaimot can change
+  // these anytime from the admin portal's Scheduling tab.
+  for (let day = 0; day < 7; day++) {
+    await setAvailabilityRule(day, {
+      startTime: "09:00",
+      endTime: "17:00",
+      enabled: day >= 1 && day <= 5,
+    });
+  }
 
   console.log("Seed complete.");
   console.log("Provider login: provider@wellsidebh.com / password123");

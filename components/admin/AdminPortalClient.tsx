@@ -21,6 +21,7 @@ import {
   UserPlus,
   CalendarDays,
   CheckCircle2,
+  Video,
 } from "lucide-react";
 import { PortalSidebar, PortalNavItem } from "@/components/PortalSidebar";
 import { PortalTopBar } from "@/components/PortalTopBar";
@@ -34,11 +35,15 @@ import { EditProfileModal } from "@/components/EditProfileModal";
 import { MessageThread, ThreadMessage } from "@/components/MessageThread";
 import { useToast, Toast } from "@/components/Toast";
 import { cn } from "@/lib/utils";
-import type { User as DbUser, Appointment, InsuranceInfo } from "@/lib/db";
+import type { User as DbUser, Appointment, InsuranceInfo, AvailabilityRule, ScheduleBlock } from "@/lib/db";
+import { DAY_LABELS } from "@/lib/scheduling-constants";
 import {
   updateProfileAction,
   sendMessageAction,
   updateAppointmentStatusAction,
+  setAvailabilityRuleAction,
+  createScheduleBlockAction,
+  deleteScheduleBlockAction,
 } from "@/lib/actions";
 
 const navItems: PortalNavItem[] = [
@@ -96,12 +101,16 @@ export function AdminPortalClient({
   appointments,
   threads,
   insurance,
+  availabilityRules,
+  scheduleBlocks,
 }: {
   provider: DbUser;
   patients: DbUser[];
   appointments: (Appointment & { patientName: string })[];
   threads: Record<string, ThreadMessage[]>;
   insurance: InsuranceInfo[];
+  availabilityRules: AvailabilityRule[];
+  scheduleBlocks: ScheduleBlock[];
 }) {
   const router = useRouter();
   const [active, setActive] = useState("dashboard");
@@ -110,6 +119,57 @@ export function AdminPortalClient({
   const [composeTo, setComposeTo] = useState(patients[0]?.id ?? "");
   const [composeText, setComposeText] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const [scheduleDraft, setScheduleDraft] = useState<
+    Record<number, { startTime: string; enabled: boolean; endTime: string }>
+  >(() => {
+    const draft: Record<number, { startTime: string; enabled: boolean; endTime: string }> = {};
+    for (let day = 0; day < 7; day++) {
+      const existing = availabilityRules.find((r) => r.dayOfWeek === day);
+      draft[day] = existing
+        ? { startTime: existing.startTime, endTime: existing.endTime, enabled: existing.enabled }
+        : { startTime: "09:00", endTime: "17:00", enabled: day >= 1 && day <= 5 };
+    }
+    return draft;
+  });
+  const [savingSchedule, setSavingSchedule] = useState(false);
+
+  function updateScheduleDraft(
+    day: number,
+    patch: Partial<{ startTime: string; endTime: string; enabled: boolean }>
+  ) {
+    setScheduleDraft((prev) => ({ ...prev, [day]: { ...prev[day], ...patch } }));
+  }
+
+  async function saveSchedule() {
+    setSavingSchedule(true);
+    for (let day = 0; day < 7; day++) {
+      await setAvailabilityRuleAction(day, scheduleDraft[day]);
+    }
+    setSavingSchedule(false);
+    showToast("Office hours saved");
+    router.refresh();
+  }
+
+  const [blockForm, setBlockForm] = useState({ date: "", startTime: "09:00", endTime: "17:00", reason: "" });
+  const [addingBlock, setAddingBlock] = useState(false);
+
+  async function addBlock() {
+    if (!blockForm.date) return;
+    setAddingBlock(true);
+    await createScheduleBlockAction(blockForm);
+    setAddingBlock(false);
+    setBlockForm({ date: "", startTime: "09:00", endTime: "17:00", reason: "" });
+    showToast("Time blocked off");
+    router.refresh();
+  }
+
+  async function removeBlock(blockId: string) {
+    await deleteScheduleBlockAction(blockId);
+    showToast("Block removed");
+    router.refresh();
+  }
+
   const { message, showToast } = useToast();
 
   const initials = provider.name.split(" ").map((n) => n[0]).join("");
@@ -294,6 +354,12 @@ export function AdminPortalClient({
                         {a.status === "CONFIRMED" && (
                           <>
                             <Badge tone="success">Confirmed</Badge>
+                            <Link href={`/video/${a.id}`} target="_blank">
+                              <Button size="sm">
+                                <Video size={14} />
+                                Join video visit
+                              </Button>
+                            </Link>
                             <Button size="sm" variant="secondary" onClick={() => handleStatus(a.id, "COMPLETED")}>
                               Complete
                             </Button>
@@ -424,18 +490,124 @@ export function AdminPortalClient({
               )}
 
               {active === "scheduling" && (
-                <div className="divide-y divide-border">
-                  <div className="flex justify-between items-center py-3 text-sm">
-                    <span>Monday – Friday</span>
-                    <Input type="time" defaultValue="09:00" className="w-32" />
+                <div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    These hours are enforced — patients can only book times
+                    you mark as available here.
+                  </p>
+                  <div className="divide-y divide-border">
+                    {DAY_LABELS.map((label, dayOfWeek) => {
+                      const rule = scheduleDraft[dayOfWeek];
+                      return (
+                        <div key={dayOfWeek} className="flex items-center justify-between py-3 gap-4">
+                          <label className="flex items-center gap-2.5 text-sm w-32 shrink-0">
+                            <input
+                              type="checkbox"
+                              checked={rule.enabled}
+                              onChange={(e) =>
+                                updateScheduleDraft(dayOfWeek, { enabled: e.target.checked })
+                              }
+                              className="h-4 w-4 rounded border-border accent-primary"
+                            />
+                            {label}
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="time"
+                              value={rule.startTime}
+                              disabled={!rule.enabled}
+                              onChange={(e) =>
+                                updateScheduleDraft(dayOfWeek, { startTime: e.target.value })
+                              }
+                              className="w-28"
+                            />
+                            <span className="text-muted-foreground text-sm">to</span>
+                            <Input
+                              type="time"
+                              value={rule.endTime}
+                              disabled={!rule.enabled}
+                              onChange={(e) =>
+                                updateScheduleDraft(dayOfWeek, { endTime: e.target.value })
+                              }
+                              className="w-28"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="flex justify-between items-center py-3 text-sm">
-                    <span>Appointment duration</span>
-                    <select className="h-9 rounded-lg border border-border bg-background px-2 text-sm">
-                      <option>30 min</option>
-                      <option>60 min</option>
-                    </select>
+                  <div className="mt-4">
+                    <Button size="sm" onClick={saveSchedule} disabled={savingSchedule}>
+                      {savingSchedule ? "Saving…" : "Save office hours"}
+                    </Button>
                   </div>
+
+                  <div className="h-px bg-border my-6" />
+
+                  <p className="font-medium text-sm mb-1">Block off time</p>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Vacation, a personal appointment, anything that should
+                    stop patients from booking that window — regardless of
+                    your regular hours above.
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <Field label="Date" htmlFor="blockDate" required>
+                      <Input
+                        id="blockDate"
+                        type="date"
+                        value={blockForm.date}
+                        onChange={(e) => setBlockForm((f) => ({ ...f, date: e.target.value }))}
+                      />
+                    </Field>
+                    <Field label="Reason" htmlFor="blockReason" optional>
+                      <Input
+                        id="blockReason"
+                        value={blockForm.reason}
+                        onChange={(e) => setBlockForm((f) => ({ ...f, reason: e.target.value }))}
+                        placeholder="e.g. Vacation"
+                      />
+                    </Field>
+                    <Field label="Start" htmlFor="blockStart" required>
+                      <Input
+                        id="blockStart"
+                        type="time"
+                        value={blockForm.startTime}
+                        onChange={(e) => setBlockForm((f) => ({ ...f, startTime: e.target.value }))}
+                      />
+                    </Field>
+                    <Field label="End" htmlFor="blockEnd" required>
+                      <Input
+                        id="blockEnd"
+                        type="time"
+                        value={blockForm.endTime}
+                        onChange={(e) => setBlockForm((f) => ({ ...f, endTime: e.target.value }))}
+                      />
+                    </Field>
+                  </div>
+                  <Button size="sm" variant="secondary" onClick={addBlock} disabled={addingBlock || !blockForm.date}>
+                    <Plus size={14} />
+                    {addingBlock ? "Adding…" : "Add block"}
+                  </Button>
+
+                  {scheduleBlocks.length > 0 && (
+                    <div className="mt-5 divide-y divide-border">
+                      {scheduleBlocks.map((b) => (
+                        <div key={b.id} className="flex justify-between items-center py-2.5 text-sm">
+                          <span>
+                            {b.date} · {b.startTime}–{b.endTime}
+                            {b.reason && <span className="text-muted-foreground"> · {b.reason}</span>}
+                          </span>
+                          <button
+                            onClick={() => removeBlock(b.id)}
+                            className="text-xs text-red-600 hover:underline"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 

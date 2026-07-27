@@ -10,6 +10,7 @@ import { Input, Field } from "@/components/ui/Input";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { SoftCard } from "@/components/ui/Card";
 import { BookingStepper, StepDef } from "@/components/BookingStepper";
+import { AvailabilityPicker } from "@/components/AvailabilityPicker";
 import { cn } from "@/lib/utils";
 import { estimateCost } from "@/lib/pricing";
 import { createAppointmentAction, updateInsuranceAction } from "@/lib/actions";
@@ -39,6 +40,7 @@ export function BookAgainClient({
   const [usesInsurance, setUsesInsurance] = useState(true);
   const [[stepIndex, direction], setStepIndex] = useState<[number, number]>([0, 1]);
   const [submitting, setSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const [appt, setAppt] = useState({
@@ -80,13 +82,19 @@ export function BookAgainClient({
 
     setSubmitting(true);
 
-    await createAppointmentAction({
+    const bookingResult = await createAppointmentAction({
       patientId,
       type: appt.type,
       date: appt.date,
       time: appt.time,
       paymentMethod: usesInsurance ? "INSURANCE" : "SELF_PAY",
     });
+
+    if (!bookingResult.ok) {
+      setBookingError(bookingResult.error ?? "That time is no longer available.");
+      setSubmitting(false);
+      return;
+    }
 
     if (usesInsurance && insuranceForm.company) {
       await updateInsuranceAction(patientId, {
@@ -168,24 +176,13 @@ export function BookAgainClient({
                   <option>Medication management (30 min)</option>
                 </select>
               </Field>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Date" htmlFor="date" required>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={appt.date}
-                    onChange={(e) => setAppt((a) => ({ ...a, date: e.target.value }))}
-                  />
-                </Field>
-                <Field label="Time" htmlFor="time" required>
-                  <Input
-                    id="time"
-                    type="time"
-                    value={appt.time}
-                    onChange={(e) => setAppt((a) => ({ ...a, time: e.target.value }))}
-                  />
-                </Field>
-              </div>
+              <AvailabilityPicker
+                date={appt.date}
+                time={appt.time}
+                appointmentType={appt.type}
+                onDateChange={(date) => setAppt((a) => ({ ...a, date }))}
+                onTimeChange={(time) => setAppt((a) => ({ ...a, time }))}
+              />
             </div>
           )}
 
@@ -311,6 +308,9 @@ export function BookAgainClient({
                   <span>${usesInsurance ? estimatedCopay.toFixed(2) : sessionFee.toFixed(2)}</span>
                 </div>
               </SoftCard>
+              {bookingError && (
+                <p className="text-sm text-red-600 mt-3">{bookingError}</p>
+              )}
             </div>
           )}
         </motion.div>

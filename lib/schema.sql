@@ -23,8 +23,11 @@ CREATE TABLE IF NOT EXISTS appointments (
                    CHECK (status IN ('REQUESTED','CONFIRMED','COMPLETED','CANCELLED')),
   payment_method TEXT NOT NULL DEFAULT 'SELF_PAY'
                    CHECK (payment_method IN ('INSURANCE','SELF_PAY')),
+  video_room_name TEXT,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS video_room_name TEXT;
 
 CREATE TABLE IF NOT EXISTS messages (
   id             TEXT PRIMARY KEY,
@@ -81,6 +84,31 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   used_at    TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- One row per day of week (0 = Sunday ... 6 = Saturday). Represents
+-- Wulaimot's real, enforced weekly office hours.
+CREATE TABLE IF NOT EXISTS availability_rules (
+  id           TEXT PRIMARY KEY,
+  day_of_week  INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+  start_time   TEXT NOT NULL,
+  end_time     TEXT NOT NULL,
+  enabled      BOOLEAN NOT NULL DEFAULT true,
+  UNIQUE (day_of_week)
+);
+
+-- One-off blocked time ranges (vacation, a personal appointment, a
+-- conference, etc.) that override the normal weekly hours for a
+-- specific date, independent of any patient appointment.
+CREATE TABLE IF NOT EXISTS schedule_blocks (
+  id         TEXT PRIMARY KEY,
+  date       TEXT NOT NULL,
+  start_time TEXT NOT NULL,
+  end_time   TEXT NOT NULL,
+  reason     TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_schedule_blocks_date ON schedule_blocks(date);
 
 CREATE INDEX IF NOT EXISTS idx_appointments_patient ON appointments(patient_id);
 CREATE INDEX IF NOT EXISTS idx_messages_thread ON messages(thread_user_id);

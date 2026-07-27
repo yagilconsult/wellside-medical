@@ -38,6 +38,8 @@ export default async function AdminPortalPage() {
   }
 
   const insurance = await db.listAllInsurance();
+  const availabilityRules = await db.getAvailabilityRules();
+  const scheduleBlocks = await db.listUpcomingScheduleBlocks();
 
   return (
     <AdminPortalClient
@@ -46,6 +48,8 @@ export default async function AdminPortalPage() {
       appointments={appointments}
       threads={threads}
       insurance={insurance}
+      availabilityRules={availabilityRules}
+      scheduleBlocks={scheduleBlocks}
     />
   );
 }

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Input, Field } from "@/components/ui/Input";
 import { SoftCard } from "@/components/ui/Card";
 import { BookingStepper, StepDef } from "@/components/BookingStepper";
+import { AvailabilityPicker } from "@/components/AvailabilityPicker";
 import { cn } from "@/lib/utils";
 import { createAppointmentAction, updateInsuranceAction } from "@/lib/actions";
 import { estimateCost } from "@/lib/pricing";
@@ -119,13 +120,22 @@ export default function BookingFlowPage() {
       return;
     }
 
-    await createAppointmentAction({
+    const bookingResult = await createAppointmentAction({
       patientId: data.id,
       type: appt.type,
       date: appt.date,
       time: appt.time,
       paymentMethod: usesInsurance ? "INSURANCE" : "SELF_PAY",
     });
+
+    if (!bookingResult.ok) {
+      setError(
+        bookingResult.error +
+          " Your account has been created — sign in and pick a new time from your portal."
+      );
+      setSubmitting(false);
+      return;
+    }
 
     if (usesInsurance && insuranceForm.company) {
       await updateInsuranceAction(data.id, {
@@ -236,24 +246,13 @@ export default function BookingFlowPage() {
                     <option>Medication management (30 min)</option>
                   </select>
                 </Field>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Date" htmlFor="date" required>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={appt.date}
-                      onChange={(e) => setAppt((a) => ({ ...a, date: e.target.value }))}
-                    />
-                  </Field>
-                  <Field label="Time" htmlFor="time" required>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={appt.time}
-                      onChange={(e) => setAppt((a) => ({ ...a, time: e.target.value }))}
-                    />
-                  </Field>
-                </div>
+                <AvailabilityPicker
+                  date={appt.date}
+                  time={appt.time}
+                  appointmentType={appt.type}
+                  onDateChange={(date) => setAppt((a) => ({ ...a, date }))}
+                  onTimeChange={(time) => setAppt((a) => ({ ...a, time }))}
+                />
 
                 <div className="h-px bg-border my-2" />
 

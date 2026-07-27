@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import * as db from "@/lib/db";
+import { isSlotStillAvailable } from "@/lib/scheduling";
 import {
   sendAppointmentConfirmationEmail,
   sendAppointmentConfirmedByProviderEmail,
@@ -37,7 +38,15 @@ export async function createAppointmentAction(input: {
   date: string;
   time: string;
   paymentMethod: db.PaymentMethod;
-}) {
+}): Promise<{ ok: boolean; error?: string }> {
+  const stillOpen = await isSlotStillAvailable(input.date, input.time, input.type);
+  if (!stillOpen) {
+    return {
+      ok: false,
+      error: "That time was just booked by someone else. Please pick another slot.",
+    };
+  }
+
   await db.createAppointment({ ...input, status: "REQUESTED" });
   revalidatePath("/portal");
   revalidatePath("/admin");
@@ -52,6 +61,8 @@ export async function createAppointmentAction(input: {
       input.time
     );
   }
+
+  return { ok: true };
 }
 
 export async function updateAppointmentStatusAction(
@@ -132,4 +143,41 @@ export async function signConsentAction(type: db.ConsentType, signedName: string
   const user = await requireSession();
   await db.upsertConsent(user.id, type, signedName);
   revalidatePath("/portal");
+}
+
+// ---------- Scheduling (provider-only) ----------
+
+export async function setAvailabilityRuleAction(
+  dayOfWeek: number,
+  patch: { startTime: string; endTime: string; enabled: boolean }
+) {
+  const user = await requireSession();
+  if (user.role !== "PROVIDER") {
+    throw new Error("Only the provider can update office hours");
+  }
+  await db.setAvailabilityRule(dayOfWeek, patch);
+  revalidatePath("/admin");
+}
+
+export async function createScheduleBlockAction(input: {
+  date: string;
+  startTime: string;
+  endTime: string;
+  reason?: string;
+}) {
+  const user = await requireSession();
+  if (user.role !== "PROVIDER") {
+    throw new Error("Only the provider can block off time");
+  }
+  await db.createScheduleBlock(input);
+  revalidatePath("/admin");
+}
+
+export async function deleteScheduleBlockAction(blockId: string) {
+  const user = await requireSession();
+  if (user.role !== "PROVIDER") {
+    throw new Error("Only the provider can remove a blocked time");
+  }
+  await db.deleteScheduleBlock(blockId);
+  revalidatePath("/admin");
 }

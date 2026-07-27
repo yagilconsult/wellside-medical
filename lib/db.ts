@@ -48,6 +48,7 @@ export interface Appointment {
   time: string;
   status: AppointmentStatus;
   paymentMethod: PaymentMethod;
+  videoRoomName?: string;
   createdAt: string;
 }
 
@@ -166,6 +167,21 @@ export async function updateAppointmentStatus(
 ): Promise<Appointment | undefined> {
   const rows = await sql<Appointment[]>`
     UPDATE appointments SET status = ${status} WHERE id = ${appointmentId} RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function findAppointmentById(appointmentId: string): Promise<Appointment | undefined> {
+  const rows = await sql<Appointment[]>`SELECT * FROM appointments WHERE id = ${appointmentId}`;
+  return rows[0];
+}
+
+export async function setAppointmentVideoRoom(
+  appointmentId: string,
+  roomName: string
+): Promise<Appointment | undefined> {
+  const rows = await sql<Appointment[]>`
+    UPDATE appointments SET video_room_name = ${roomName} WHERE id = ${appointmentId} RETURNING *
   `;
   return rows[0];
 }
@@ -374,4 +390,82 @@ export async function deletePatientCompletely(patientId: string): Promise<{ dele
   await sql`DELETE FROM users WHERE id = ${patientId}`;
 
   return { deleted: true, name: user.name };
+}
+
+// ---------- Availability (real, enforced weekly office hours) ----------
+
+export interface AvailabilityRule {
+  id: string;
+  dayOfWeek: number; // 0 = Sunday ... 6 = Saturday
+  startTime: string; // "09:00"
+  endTime: string; // "17:00"
+  enabled: boolean;
+}
+
+export async function getAvailabilityRules(): Promise<AvailabilityRule[]> {
+  const rows = await sql<AvailabilityRule[]>`
+    SELECT * FROM availability_rules ORDER BY day_of_week ASC
+  `;
+  return rows;
+}
+
+export async function setAvailabilityRule(
+  dayOfWeek: number,
+  patch: { startTime: string; endTime: string; enabled: boolean }
+): Promise<AvailabilityRule> {
+  const rows = await sql<AvailabilityRule[]>`
+    INSERT INTO availability_rules (id, day_of_week, start_time, end_time, enabled)
+    VALUES (${id()}, ${dayOfWeek}, ${patch.startTime}, ${patch.endTime}, ${patch.enabled})
+    ON CONFLICT (day_of_week)
+    DO UPDATE SET start_time = ${patch.startTime}, end_time = ${patch.endTime}, enabled = ${patch.enabled}
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function listAppointmentsForDate(date: string): Promise<Appointment[]> {
+  return sql<Appointment[]>`
+    SELECT * FROM appointments
+    WHERE date = ${date} AND status IN ('REQUESTED', 'CONFIRMED')
+  `;
+}
+
+// ---------- Schedule blocks (one-off blocked time, e.g. vacation) ----------
+
+export interface ScheduleBlock {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  reason: string | null;
+  createdAt: string;
+}
+
+export async function listScheduleBlocksForDate(date: string): Promise<ScheduleBlock[]> {
+  return sql<ScheduleBlock[]>`SELECT * FROM schedule_blocks WHERE date = ${date}`;
+}
+
+export async function listUpcomingScheduleBlocks(): Promise<ScheduleBlock[]> {
+  const today = new Date().toISOString().slice(0, 10);
+  return sql<ScheduleBlock[]>`
+    SELECT * FROM schedule_blocks WHERE date >= ${today} ORDER BY date ASC, start_time ASC
+  `;
+}
+
+export async function createScheduleBlock(input: {
+  date: string;
+  startTime: string;
+  endTime: string;
+  reason?: string;
+}): Promise<ScheduleBlock> {
+  const rows = await sql<ScheduleBlock[]>`
+    INSERT INTO schedule_blocks (id, date, start_time, end_time, reason)
+    VALUES (${id()}, ${input.date}, ${input.startTime}, ${input.endTime}, ${input.reason ?? null})
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function deleteScheduleBlock(blockId: string): Promise<void> {
+  await sql`DELETE FROM schedule_blocks WHERE id = ${blockId}`;
 }

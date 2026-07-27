@@ -45,7 +45,25 @@ production, since Vercel's deployed filesystem is read-only). Once you
 deploy, make sure `BLOB_READ_WRITE_TOKEN` is also added to Vercel's
 Environment Variables, same as the other secrets.
 
-### 4. Install, migrate, seed, run
+### 4. (Optional but recommended) Set up real video visits
+
+Video visits use [Daily.co](https://daily.co).
+
+1. Sign up at [daily.co](https://dashboard.daily.co)
+2. Your subdomain is shown in the dashboard URL, e.g. `your-team.daily.co`
+   — that part before `.daily.co` is your `DAILY_DOMAIN`
+3. Developers section → copy your API key → paste into `.env` as
+   `DAILY_API_KEY`
+
+**Before any real patient uses this:** Daily's free/standard tier is
+**not HIPAA-eligible**. A video visit is the actual clinical session —
+the most sensitive data on this platform. Upgrading to Daily's HIPAA
+add-on plan and signing a BAA is required before real use, the same way
+the (still-paused) insurance verification integration needs a BAA before
+going live. The integration is fully built and testable right now on the
+free tier — this only matters before real patients are involved.
+
+### 5. Install, migrate, seed, run
 
 ```bash
 npm install
@@ -79,6 +97,9 @@ Or register a brand new patient account through the real `/book` flow.
      confirmation emails actually send in production
    - `BLOB_READ_WRITE_TOKEN` — your Vercel Blob token, so insurance card
      uploads work in production
+   - `DAILY_API_KEY` and `DAILY_DOMAIN` — so video visits work in
+     production (remember: upgrade to Daily's HIPAA plan + signed BAA
+     before real patients use this)
 4. Deploy
 5. Run the migration once against your production database (you can run
    `npm run db:migrate` locally with `DATABASE_URL` temporarily pointed
@@ -155,6 +176,21 @@ Route access is enforced by `middleware.ts` based on real session role
   production build. `npm run db:retire-demo-accounts` permanently
   removes the seeded demo patients (and all their data) from the
   database when you're ready, without touching the real provider account.
+- **Real video visits** — via Daily.co. A private, per-appointment video
+  room is created automatically, and "Join video visit" appears for both
+  patient and provider once an appointment is confirmed. Access is
+  gated server-side: only the patient on that specific appointment or
+  the provider can generate a valid join token.
+- **Real, enforced scheduling** — Wulaimot sets her actual weekly office
+  hours in the admin portal's Scheduling tab (`lib/scheduling.ts`), and
+  both booking flows only show genuinely open time slots, correctly
+  accounting for each appointment type's real duration. A server-side
+  re-check at the moment of booking prevents two people from grabbing
+  the same slot in a race. Requested (not just confirmed) appointments
+  already block their slot, so two patients can't even both request the
+  same time. She can also block off one-off time — a vacation day, a
+  personal appointment, anything — with an optional reason, independent
+  of her regular weekly hours.
 
 ## Known limitations / next phase
 
@@ -162,9 +198,12 @@ Route access is enforced by `middleware.ts` based on real session role
   portal has "mark verified / reject" actions instead of an automated
   check. A real-time eligibility API (e.g. Stedi, pVerify) was scoped and
   is ready to wire in once a vendor is chosen and a BAA is signed.
-- **No real video visit provider wired up** (e.g. Twilio Video, Daily.co)
-  — appointments are scheduled but the actual video session isn't
-  implemented.
+- **Video visits need a HIPAA-eligible plan before real patient use.**
+  The Daily.co integration is fully functional right now, but Daily's
+  free/standard tier is not HIPAA-eligible — a video visit is the actual
+  clinical session, the most sensitive data on this platform. Upgrade to
+  Daily's HIPAA add-on plan and get a signed BAA before any real patient
+  joins a call.
 - **The provider account's password should be rotated to something real**
   once demo accounts are retired — use "Forgot password" on the login
   page for `provider@wellsidebh.com` rather than leaving it on the

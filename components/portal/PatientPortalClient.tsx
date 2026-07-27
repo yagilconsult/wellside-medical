@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   CheckCircle2,
   Plus,
+  Video,
 } from "lucide-react";
 import { PortalSidebar, PortalNavItem } from "@/components/PortalSidebar";
 import { PortalTopBar } from "@/components/PortalTopBar";
@@ -323,6 +324,14 @@ export function PatientPortalClient({
                             <Badge tone={a.status === "CONFIRMED" ? "success" : "warning"}>
                               {a.status === "CONFIRMED" ? "Confirmed" : "Requested"}
                             </Badge>
+                            {a.status === "CONFIRMED" && (
+                              <Link href={`/video/${a.id}`} target="_blank">
+                                <Button size="sm">
+                                  <Video size={14} />
+                                  Join video visit
+                                </Button>
+                              </Link>
+                            )}
                             <Button size="sm" variant="secondary" onClick={() => showToast("Reschedule request sent")}>
                               Reschedule
                             </Button>
