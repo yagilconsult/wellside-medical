@@ -34,7 +34,9 @@ export function AvailabilityPicker({
     }
     let cancelled = false;
     setLoading(true);
-    fetch(`/api/availability?date=${date}&type=${encodeURIComponent(appointmentType)}`)
+    fetch(`/api/availability?date=${date}&type=${encodeURIComponent(appointmentType)}`, {
+      cache: "no-store",
+    })
       .then((res) => res.json())
       .then((data) => {
         if (!cancelled) {

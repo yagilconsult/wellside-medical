@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Input, Field } from "@/components/ui/Input";
 import { SoftCard } from "@/components/ui/Card";
 import { BookingStepper, StepDef } from "@/components/BookingStepper";
-import { AvailabilityPicker } from "@/components/AvailabilityPicker";
+import { AvailabilityPicker } from "@/components/AvailabilityPickers";
 import { cn } from "@/lib/utils";
 import { createAppointmentAction, updateInsuranceAction } from "@/lib/actions";
 import { estimateCost } from "@/lib/pricing";

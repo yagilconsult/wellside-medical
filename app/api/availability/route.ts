@@ -5,7 +5,15 @@ import { getAvailableSlots } from "@/lib/scheduling";
  * Public on purpose — the guest booking flow needs to check availability
  * before an account exists. Doesn't expose anything sensitive, just
  * which times are open on a given date.
+ *
+ * Explicitly forced dynamic + no-store: this route has no auth check
+ * (one of the few that doesn't), so Next.js can otherwise decide to
+ * cache/statically optimize it — which would silently serve stale
+ * availability data. Always compute fresh.
  */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const date = searchParams.get("date");
@@ -16,5 +24,8 @@ export async function GET(req: Request) {
   }
 
   const slots = await getAvailableSlots(date, type);
-  return NextResponse.json({ slots });
+  return NextResponse.json(
+    { slots },
+    { headers: { "Cache-Control": "no-store, must-revalidate" } }
+  );
 }
