@@ -12,6 +12,7 @@ import { SoftCard } from "@/components/ui/Card";
 import { BookingStepper, StepDef } from "@/components/BookingStepper";
 import { AvailabilityPicker } from "@/components/AvailabilityPicker";
 import { cn } from "@/lib/utils";
+import { HEADWAY_URL } from "@/lib/links";
 import { createAppointmentAction, updateInsuranceAction } from "@/lib/actions";
 import { estimateCost } from "@/lib/pricing";
 
@@ -346,6 +347,19 @@ export default function BookingFlowPage() {
                   Self pay
                 </motion.button>
               </div>
+              {usesInsurance && (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Insurance visits are booked and billed through Headway.{" "}
+                  <a
+                    href={HEADWAY_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary underline"
+                  >
+                    Book with insurance on Headway
+                  </a>
+                </p>
+              )}
             </div>
           )}
 

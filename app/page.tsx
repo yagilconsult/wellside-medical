@@ -35,6 +35,7 @@ import { HeartbeatDivider } from "@/components/HeartbeatDivider";
 import { Footer } from "@/components/Footer";
 import { TelehealthIllustration } from "@/components/TelehealthIllustration";
 import { ReadyCta } from "@/components/ReadyCta";
+import { HEADWAY_URL } from "@/lib/links";
 
 const services = [
   {
@@ -710,11 +711,19 @@ export default function HomePage() {
           We check your coverage before your first appointment and tell you
           your estimated copay upfront, with no guessing and no surprise bills.
         </p>
-        <Link href="/book">
-          <Button size="lg" variant="secondary">
-            Verify your insurance
-          </Button>
-        </Link>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a href={HEADWAY_URL} target="_blank" rel="noopener noreferrer">
+            <Button size="lg">Book with insurance on Headway</Button>
+          </a>
+          <Link href="/book">
+            <Button size="lg" variant="secondary">
+              Self-pay booking
+            </Button>
+          </Link>
+        </div>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Insurance visits are scheduled and billed through Headway, our insurance partner.
+        </p>
       </motion.section>
 
       <section id="faq" className="bg-muted">

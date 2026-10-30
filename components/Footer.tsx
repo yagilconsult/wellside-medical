@@ -5,11 +5,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Mail, MapPin } from "lucide-react";
 import { PulseDot } from "@/components/PulseDot";
+import { HEADWAY_URL } from "@/lib/links";
 
 const quickLinks = [
   { label: "Our Services", href: "/#services" },
   { label: "About Us", href: "/#meet-wulaimot" },
   { label: "Insurance", href: "/#insurance" },
+  { label: "Book with insurance (Headway)", href: HEADWAY_URL },
   { label: "Contact", href: "/book" },
 ];
 
@@ -104,6 +106,9 @@ export function Footer() {
                 <motion.li key={link.label} whileHover={{ x: 4 }}>
                   <Link
                     href={link.href}
+                    {...(link.href.startsWith("http")
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
                     className="text-sm text-primary-foreground/75 hover:text-primary-foreground transition-colors"
                   >
                     {link.label}
