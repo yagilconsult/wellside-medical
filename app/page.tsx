@@ -97,9 +97,9 @@ const whyChoose = [
   },
   {
     icon: CheckCircle2,
-    title: "Insurance Accepted",
+    title: "Insurance or Self-Pay",
     description:
-      "Most major insurance plans are accepted, and self-pay pricing is upfront, with no surprise bills.",
+      "Use your insurance through Headway, or pay privately with upfront pricing and no surprise bills.",
   },
 ];
 
@@ -110,7 +110,7 @@ const faqs = [
   },
   {
     q: "Do you accept insurance?",
-    a: "Yes. We verify your coverage before your first appointment and provide an estimated copay in advance.",
+    a: "Yes, through Headway. Search for Wulaimot on Headway to book and be billed through your insurance. You can also pay privately on this site, with upfront pricing.",
   },
   {
     q: "How do I prepare?",
@@ -278,11 +278,11 @@ export default function HomePage() {
                 Book appointment
               </Button>
             </Link>
-            <Link href="/book?step=insurance">
+            <a href={HEADWAY_URL} target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="secondary" className="!border-white/40 !text-white hover:!bg-white/10">
-                Verify insurance
+                Use insurance
               </Button>
-            </Link>
+            </a>
           </motion.div>
 
           <motion.div variants={heroItem} className="h-px bg-white/20 max-w-md mx-auto mb-8" />
@@ -708,8 +708,9 @@ export default function HomePage() {
           Use your insurance or pay privately
         </h2>
         <p className="text-muted-foreground mb-8">
-          We check your coverage before your first appointment and tell you
-          your estimated copay upfront, with no guessing and no surprise bills.
+          Insurance patients book, are billed and have their visits through
+          Headway. Prefer to pay privately, or not use your insurance? Book
+          directly here with upfront pricing and no surprise bills.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <a href={HEADWAY_URL} target="_blank" rel="noopener noreferrer">

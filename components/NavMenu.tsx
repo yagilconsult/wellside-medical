@@ -21,7 +21,7 @@ export function NavMenu() {
   const portalHref = session?.user?.role === "PROVIDER" ? "/admin" : "/portal";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
+    <header className="glass sticky top-0 z-50 border-b border-border/60">
       <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-3">
         <Link href="/" className="flex items-center gap-2">
           <Image
@@ -62,7 +62,7 @@ export function NavMenu() {
           )}
           <button
             onClick={() => setMobileOpen((o) => !o)}
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
+            className="md:hidden flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
           >
@@ -78,7 +78,7 @@ export function NavMenu() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden overflow-hidden border-t border-border bg-background"
+            className="md:hidden overflow-hidden border-t border-border/60"
           >
             <div className="flex flex-col px-6 py-4 gap-3 text-sm">
               {navLinks.map((l) => (

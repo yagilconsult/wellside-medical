@@ -32,7 +32,8 @@ const slideVariants = {
 
 export default function BookingFlowPage() {
   const router = useRouter();
-  const [usesInsurance, setUsesInsurance] = useState(true);
+  // Insurance visits are booked on Headway; this site is self-pay only.
+  const usesInsurance = false;
   const [[stepIndex, direction], setStepIndex] = useState<[number, number]>([0, 1]);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -317,49 +318,35 @@ export default function BookingFlowPage() {
           {currentKey === "payment" && (
             <div>
               <p className="font-medium mb-4">Payment method</p>
-              <div className="grid grid-cols-2 gap-4">
-                <motion.button
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setUsesInsurance(true)}
-                  className={cn(
-                    "rounded-lg border p-4 text-center text-sm",
-                    usesInsurance
-                      ? "border-2 border-primary text-primary font-medium"
-                      : "border-border"
-                  )}
-                >
-                  <ShieldCheck size={18} className="mx-auto mb-2" />
-                  Use insurance
-                </motion.button>
-                <motion.button
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setUsesInsurance(false)}
-                  className={cn(
-                    "rounded-lg border p-4 text-center text-sm",
-                    !usesInsurance
-                      ? "border-2 border-primary text-primary font-medium"
-                      : "border-border"
-                  )}
-                >
-                  <Wallet size={18} className="mx-auto mb-2" />
-                  Self pay
-                </motion.button>
+              <div className="space-y-4">
+                <div className="rounded-lg border-2 border-primary p-4 text-sm">
+                  <div className="flex items-center gap-2 font-medium text-primary">
+                    <Wallet size={18} />
+                    Self pay
+                  </div>
+                  <p className="mt-2 text-muted-foreground">
+                    Pay for your visit directly. This is also the right option if you have
+                    insurance but would rather not use it.
+                  </p>
+                </div>
+                <div className="rounded-lg border border-border p-4 text-sm">
+                  <div className="flex items-center gap-2 font-medium">
+                    <ShieldCheck size={18} />
+                    Want to use your insurance?
+                  </div>
+                  <p className="mt-2 text-muted-foreground">
+                    Insurance visits are booked, billed and held through Headway.{" "}
+                    <a
+                      href={HEADWAY_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-primary underline"
+                    >
+                      Book with insurance on Headway
+                    </a>
+                  </p>
+                </div>
               </div>
-              {usesInsurance && (
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Insurance visits are booked and billed through Headway.{" "}
-                  <a
-                    href={HEADWAY_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-primary underline"
-                  >
-                    Book with insurance on Headway
-                  </a>
-                </p>
-              )}
             </div>
           )}
 
