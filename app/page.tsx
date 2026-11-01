@@ -29,12 +29,19 @@ import {
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+
 import { HeroPhotoBackground } from "@/components/HeroPhotoBackground";
 import { HeartbeatDivider } from "@/components/HeartbeatDivider";
 import { Footer } from "@/components/Footer";
 import { TelehealthIllustration } from "@/components/TelehealthIllustration";
 import { ReadyCta } from "@/components/ReadyCta";
+import {
+  TrustBar,
+  ServiceCard,
+  WhyCard,
+  FeatureCard,
+  ChecklistCard,
+} from "@/components/landing/Cards";
 import { HEADWAY_URL } from "@/lib/links";
 
 const services = [
@@ -127,11 +134,11 @@ const faqs = [
 ];
 
 const trustBadges = [
-  { icon: FileCheck, label: "Licensed, PMHNP-led psychiatric care" },
-  { icon: Lock, label: "Secure, HIPAA-conscious platform" },
-  { icon: CalendarClock, label: "Same-day & next-day appointments" },
-  { icon: BadgeDollarSign, label: "Transparent pricing, no hidden fees" },
-  { icon: MapPinned, label: "Serving patients throughout the state" },
+  { icon: FileCheck, label: "Licensed, PMHNP-led psychiatric care", title: "Licensed provider", tag: "Clinical" },
+  { icon: Lock, label: "Secure, HIPAA-conscious platform", title: "Private by design", tag: "Privacy" },
+  { icon: CalendarClock, label: "Same-day & next-day appointments", title: "Fast scheduling", tag: "Access" },
+  { icon: BadgeDollarSign, label: "Transparent pricing, no hidden fees", title: "Upfront pricing", tag: "Cost" },
+  { icon: MapPinned, label: "Serving patients throughout the state", title: "Statewide care", tag: "Coverage" },
 ];
 
 const telehealthFeatures = [
@@ -189,18 +196,24 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   return (
     <motion.div
       variants={revealItem}
-      className="rounded-lg bg-background border border-border overflow-hidden"
+      className={`overflow-hidden rounded-2xl border bg-card transition-[border-color,box-shadow] duration-300 ${
+        open ? "border-primary/30 shadow-card-hover" : "border-border/70 shadow-card hover:border-primary/20"
+      }`}
     >
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between p-5 text-left"
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-4 p-5 text-left transition-transform duration-100 active:scale-[0.99]"
       >
-        <span className="font-medium text-sm">{q}</span>
+        <span className="font-display text-base font-semibold tracking-tight">{q}</span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
+            open ? "bg-primary text-primary-foreground" : "bg-accent text-primary"
+          }`}
         >
-          <ChevronDown size={16} className="text-muted-foreground" />
+          <ChevronDown size={16} />
         </motion.span>
       </button>
       <motion.div
@@ -209,7 +222,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className="overflow-hidden"
       >
-        <p className="text-sm text-muted-foreground px-5 pb-5">{a}</p>
+        <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{a}</p>
       </motion.div>
     </motion.div>
   );
@@ -316,38 +329,37 @@ export default function HomePage() {
 
       <HeartbeatDivider className="bg-accent" />
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="font-display text-xl md:text-2xl font-semibold text-center mb-10"
-        >
-          What to expect when you book with us
-        </motion.h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
-          {trustBadges.map((badge, i) => (
-            <motion.div
-              key={badge.label}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -6 }}
-              className={i % 2 === 1 ? "sm:mt-6" : ""}
-            >
-              <Card className="p-5 h-full">
-                <motion.div
-                  whileHover={{ scale: 1.12, rotate: -6 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground"
-                >
-                  <badge.icon size={18} />
-                </motion.div>
-                <p className="text-sm font-medium leading-snug">{badge.label}</p>
-              </Card>
-            </motion.div>
-          ))}
+      <section className="relative overflow-hidden bg-gradient-to-b from-accent via-accent/40 to-transparent">
+        {/* Fine teal dot grid that fades out toward the bottom */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(hsl(var(--primary)/0.14)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
+        />
+        {/* Soft glows: one behind the top-left of the staircase, one where it lands */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-24 top-0 h-80 w-80 rounded-full bg-primary/10 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-24 -right-16 h-96 w-96 rounded-full bg-primary/[0.12] blur-3xl"
+        />
+
+        <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-16">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-14 text-center"
+          >
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+              Your first visit
+            </p>
+            <h2 className="font-display text-2xl font-semibold md:text-3xl">
+              What to expect when you book with us
+            </h2>
+          </motion.div>
+          <TrustBar items={trustBadges} />
         </div>
       </section>
 
@@ -371,26 +383,13 @@ export default function HomePage() {
         </motion.p>
         <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
           {services.map((service, i) => (
-            <motion.div
-              key={service.title}
-              variants={revealItem}
-              whileHover={{ y: -6 }}
-              transition={{ duration: 0.25, delay: i * 0.03 }}
-              className="text-left"
-            >
-              <Card className="p-6 h-full rounded-xl">
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-primary"
-                >
-                  <service.icon size={20} />
-                </motion.div>
-                <p className="font-medium mb-2">{service.title}</p>
-                <p className="text-sm text-muted-foreground">
-                  {service.description}
-                </p>
-              </Card>
+            <motion.div key={service.title} variants={revealItem} className="h-full">
+              <ServiceCard
+                icon={service.icon}
+                title={service.title}
+                description={service.description}
+                index={i}
+              />
             </motion.div>
           ))}
         </div>
@@ -536,27 +535,21 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
             {telehealthFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ y: -4 }}
-                className="text-center"
+                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className="h-full"
               >
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-accent text-primary"
-                >
-                  <feature.icon size={18} />
-                </motion.div>
-                <p className="text-sm font-medium mb-1">{feature.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {feature.description}
-                </p>
+                <FeatureCard
+                  icon={feature.icon}
+                  title={feature.title}
+                  description={feature.description}
+                />
               </motion.div>
             ))}
           </div>
@@ -593,25 +586,8 @@ export default function HomePage() {
           </motion.p>
           <div className="grid gap-5 sm:grid-cols-2">
             {whyChoose.map((item) => (
-              <motion.div
-                key={item.title}
-                variants={revealItem}
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.25 }}
-              >
-                <Card className="p-6 h-full rounded-xl text-left">
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                    className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-primary"
-                  >
-                    <item.icon size={18} />
-                  </motion.div>
-                  <p className="font-medium mb-1.5">{item.title}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {item.description}
-                  </p>
-                </Card>
+              <motion.div key={item.title} variants={revealItem} className="h-full">
+                <WhyCard icon={item.icon} title={item.title} description={item.description} />
               </motion.div>
             ))}
           </div>
@@ -660,38 +636,24 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl bg-background p-5">
-              <p className="font-medium text-sm mb-3">Clinical Expertise</p>
-              <ul className="space-y-1.5">
-                {[
-                  "Psychiatric Evaluations",
-                  "Medication Management",
-                  "Evidence-Based Strategies",
-                  "Holistic Treatment Planning",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <span className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-xl bg-background p-5">
-              <p className="font-medium text-sm mb-3">Specializations</p>
-              <ul className="space-y-1.5">
-                {[
-                  "Anxiety & Depression",
-                  "ADHD",
-                  "PTSD & Trauma",
-                  "Mood Disorders & Bipolar",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <span className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ChecklistCard
+              title="Clinical expertise"
+              items={[
+                "Psychiatric Evaluations",
+                "Medication Management",
+                "Evidence-Based Strategies",
+                "Holistic Treatment Planning",
+              ]}
+            />
+            <ChecklistCard
+              title="Specializations"
+              items={[
+                "Anxiety & Depression",
+                "ADHD",
+                "PTSD & Trauma",
+                "Mood Disorders & Bipolar",
+              ]}
+            />
           </div>
         </motion.div>
       </section>
