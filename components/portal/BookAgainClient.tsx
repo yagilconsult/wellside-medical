@@ -85,7 +85,6 @@ export function BookAgainClient({
     setSubmitting(true);
 
     const bookingResult = await createAppointmentAction({
-      patientId,
       type: appt.type,
       date: appt.date,
       time: appt.time,

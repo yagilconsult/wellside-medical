@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { findUserByEmail } from "@/lib/db";
 
 export const authOptions: NextAuthOptions = {
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 60 * 60 * 8 }, // 8 hours
   pages: {
     signIn: "/login",
   },

@@ -10,8 +10,9 @@ export default async function PatientPortalPage() {
     redirect("/login");
   }
 
-  const user = await db.findUserById(session.user.id);
-  if (!user) redirect("/login");
+  const userRow = await db.findUserById(session.user.id);
+  if (!userRow) redirect("/login");
+  const user = db.toPublicUser(userRow);
 
   const appointments = await db.listAppointmentsForPatient(user.id);
   const rawMessages = await db.listMessagesForThread(user.id);

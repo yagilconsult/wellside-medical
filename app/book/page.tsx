@@ -122,8 +122,21 @@ export default function BookingFlowPage() {
       return;
     }
 
+    // Sign in first: booking requires a session, so the appointment is
+    // always created for the signed-in patient.
+    const signInResult = await signIn("credentials", {
+      email: patient.email,
+      password,
+      redirect: false,
+    });
+
+    if (signInResult?.error) {
+      setSubmitting(false);
+      router.push("/login");
+      return;
+    }
+
     const bookingResult = await createAppointmentAction({
-      patientId: data.id,
       type: appt.type,
       date: appt.date,
       time: appt.time,
@@ -133,9 +146,11 @@ export default function BookingFlowPage() {
     if (!bookingResult.ok) {
       setError(
         bookingResult.error +
-          " Your account has been created — sign in and pick a new time from your portal."
+          " Your account has been created — pick a new time from your portal."
       );
       setSubmitting(false);
+      // They're signed in now; send them to pick a new time after they've read the message.
+      setTimeout(() => router.push("/portal/book"), 3500);
       return;
     }
 
@@ -149,19 +164,7 @@ export default function BookingFlowPage() {
       });
     }
 
-    const signInResult = await signIn("credentials", {
-      email: patient.email,
-      password,
-      redirect: false,
-    });
-
     setSubmitting(false);
-
-    if (signInResult?.error) {
-      router.push("/login");
-      return;
-    }
-
     setSuccess(true);
     await new Promise((r) => setTimeout(r, 1100));
     router.push("/intake");

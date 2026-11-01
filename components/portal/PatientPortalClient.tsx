@@ -30,7 +30,7 @@ import { EditProfileModal } from "@/components/EditProfileModal";
 import { MessageThread, ThreadMessage } from "@/components/MessageThread";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { useToast, Toast } from "@/components/Toast";
-import type { User as DbUser, Appointment, InsuranceInfo, ConsentForm } from "@/lib/db";
+import type { PublicUser as DbUser, Appointment, InsuranceInfo, ConsentForm } from "@/lib/db";
 import {
   updateProfileAction,
   sendMessageAction,
@@ -144,7 +144,11 @@ export function PatientPortalClient({
         ]}
         values={{ name: user.name, email: user.email, phone: user.phone ?? "" }}
         onSave={async (v) => {
-          await updateProfileAction({ name: v.name, email: v.email, phone: v.phone });
+          const res = await updateProfileAction({ name: v.name, email: v.email, phone: v.phone });
+          if (!res.ok) {
+            showToast(res.error ?? "Couldn't update profile");
+            return;
+          }
           showToast("Profile updated");
           router.refresh();
         }}

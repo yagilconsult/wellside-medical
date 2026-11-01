@@ -1,4 +1,5 @@
 import postgres from "postgres";
+import { randomBytes, randomUUID, createHash } from "crypto";
 
 /**
  * Real Postgres data layer (e.g. Neon, Supabase, Vercel Postgres, or any
@@ -95,7 +96,15 @@ export interface ConsentForm {
 }
 
 function id() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+  return randomUUID();
+}
+
+/** User as safe to send to the browser — never includes the password hash. */
+export type PublicUser = Omit<User, "passwordHash">;
+
+export function toPublicUser(u: User): PublicUser {
+  const { passwordHash: _omit, ...rest } = u;
+  return rest;
 }
 
 // ---------- Users ----------
@@ -133,8 +142,11 @@ export async function updateUser(userId: string, patch: Partial<User>): Promise<
   return rows[0];
 }
 
-export async function listPatients(): Promise<User[]> {
-  return sql<User[]>`SELECT * FROM users WHERE role = 'PATIENT' ORDER BY created_at DESC`;
+export async function listPatients(): Promise<PublicUser[]> {
+  return sql<PublicUser[]>`
+    SELECT id, email, role, name, phone, dob, created_at
+    FROM users WHERE role = 'PATIENT' ORDER BY created_at DESC
+  `;
 }
 
 // ---------- Appointments ----------
@@ -333,8 +345,12 @@ export interface PasswordResetToken {
 }
 
 function randomToken() {
-  const bytes = Array.from({ length: 32 }, () => Math.floor(Math.random() * 256));
-  return Buffer.from(bytes).toString("base64url");
+  return randomBytes(32).toString("base64url");
+}
+
+/** Only a hash of the reset token is stored, so a database leak can't be used to reset passwords. */
+function hashToken(token: string) {
+  return createHash("sha256").update(token).digest("hex");
 }
 
 export async function createPasswordResetToken(userId: string): Promise<PasswordResetToken> {
@@ -342,10 +358,11 @@ export async function createPasswordResetToken(userId: string): Promise<Password
   const expiresAt = new Date(Date.now() + 1000 * 60 * 30).toISOString(); // 30 minutes
   const rows = await sql<PasswordResetToken[]>`
     INSERT INTO password_reset_tokens (id, user_id, token, expires_at)
-    VALUES (${id()}, ${userId}, ${token}, ${expiresAt})
+    VALUES (${id()}, ${userId}, ${hashToken(token)}, ${expiresAt})
     RETURNING *
   `;
-  return rows[0];
+  // Return the raw token (for the email link); only its hash is in the database.
+  return { ...rows[0], token };
 }
 
 export async function findValidPasswordResetToken(
@@ -353,7 +370,7 @@ export async function findValidPasswordResetToken(
 ): Promise<PasswordResetToken | undefined> {
   const rows = await sql<PasswordResetToken[]>`
     SELECT * FROM password_reset_tokens
-    WHERE token = ${token} AND used_at IS NULL AND expires_at > now()
+    WHERE token = ${hashToken(token)} AND used_at IS NULL AND expires_at > now()
   `;
   return rows[0];
 }

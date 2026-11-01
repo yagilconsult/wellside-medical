@@ -35,7 +35,7 @@ import { EditProfileModal } from "@/components/EditProfileModal";
 import { MessageThread, ThreadMessage } from "@/components/MessageThread";
 import { useToast, Toast } from "@/components/Toast";
 import { cn } from "@/lib/utils";
-import type { User as DbUser, Appointment, InsuranceInfo, AvailabilityRule, ScheduleBlock } from "@/lib/db";
+import type { PublicUser as DbUser, Appointment, InsuranceInfo, AvailabilityRule, ScheduleBlock } from "@/lib/db";
 import { DAY_LABELS } from "@/lib/scheduling-constants";
 import {
   updateProfileAction,
@@ -205,7 +205,11 @@ export function AdminPortalClient({
         ]}
         values={{ name: provider.name, email: provider.email, phone: provider.phone ?? "" }}
         onSave={async (v) => {
-          await updateProfileAction({ name: v.name, email: v.email, phone: v.phone });
+          const res = await updateProfileAction({ name: v.name, email: v.email, phone: v.phone });
+          if (!res.ok) {
+            showToast(res.error ?? "Couldn't update profile");
+            return;
+          }
           showToast("Profile updated");
           router.refresh();
         }}

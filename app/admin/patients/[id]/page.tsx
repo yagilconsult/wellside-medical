@@ -14,8 +14,9 @@ export default async function PatientProfilePage({
     redirect("/login");
   }
 
-  const patient = await db.findUserById(params.id);
-  if (!patient || patient.role !== "PATIENT") notFound();
+  const patientRow = await db.findUserById(params.id);
+  if (!patientRow || patientRow.role !== "PATIENT") notFound();
+  const patient = db.toPublicUser(patientRow);
 
   const appointments = await db.listAppointmentsForPatient(patient.id);
   const insurance = await db.getInsuranceForPatient(patient.id);

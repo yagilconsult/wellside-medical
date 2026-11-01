@@ -24,7 +24,10 @@ export async function POST(req: Request) {
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
-  const label = (formData.get("label") as string) || "upload";
+  // Label becomes part of the stored file name — keep it to safe characters.
+  const label =
+    ((formData.get("label") as string) || "upload").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) ||
+    "upload";
 
   if (!file) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -39,7 +42,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const safeExt = file.name.includes(".") ? file.name.split(".").pop() : "bin";
+  // Extension comes from the validated MIME type, never from the user's file name.
+  const EXT_BY_TYPE: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/heic": "heic",
+    "application/pdf": "pdf",
+  };
+  const safeExt = EXT_BY_TYPE[file.type];
   const filename = `insurance-cards/${session.user.id}/${label}-${Date.now()}.${safeExt}`;
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {

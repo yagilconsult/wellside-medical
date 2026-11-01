@@ -11,8 +11,9 @@ export default async function AdminPortalPage() {
     redirect("/login");
   }
 
-  const provider = await db.findUserById(session.user.id);
-  if (!provider) redirect("/login");
+  const providerRow = await db.findUserById(session.user.id);
+  if (!providerRow) redirect("/login");
+  const provider = db.toPublicUser(providerRow);
 
   const patients = await db.listPatients();
   const allAppointments = await db.listAllAppointments();

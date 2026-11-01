@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { InsuranceCard } from "@/components/InsuranceCard";
 import { useToast, Toast } from "@/components/Toast";
 import { updateInsuranceAction } from "@/lib/actions";
-import type { User, Appointment, InsuranceInfo, IntakeForm, ConsentForm } from "@/lib/db";
+import type { PublicUser as User, Appointment, InsuranceInfo, IntakeForm, ConsentForm } from "@/lib/db";
 
 const tabs = ["overview", "insurance", "clinical", "documents", "billing"] as const;
 type Tab = (typeof tabs)[number];
