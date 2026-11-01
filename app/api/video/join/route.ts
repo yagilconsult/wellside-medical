@@ -50,9 +50,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: roomUrl(roomName, token) });
   } catch (err) {
     console.error("[video/join] failed:", err);
-    return NextResponse.json(
-      { error: "Video visits aren't configured yet. Add DAILY_API_KEY and DAILY_DOMAIN." },
-      { status: 500 }
-    );
+    // Setup details are only useful to the provider; patients get plain wording.
+    const message = isProvider
+      ? "Video visits aren't configured yet. Add DAILY_API_KEY and DAILY_DOMAIN in Vercel."
+      : "Your video visit isn't available just yet. Please message your provider and she'll send you the details to join.";
+    return NextResponse.json({ error: message }, { status: 503 });
   }
 }
