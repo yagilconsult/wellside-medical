@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PulseDot } from "@/components/PulseDot";
+import { PHONE_DISPLAY, PHONE_HREF } from "@/lib/links";
 
 export function ReadyCta() {
   return (
@@ -39,12 +40,20 @@ export function ReadyCta() {
           </p>
         </div>
 
-        <Link href="/book" className="relative shrink-0">
-          <Button size="lg">
-            Book appointment
-            <ArrowRight size={16} />
-          </Button>
-        </Link>
+        <div className="relative flex shrink-0 flex-col items-center gap-3 sm:flex-row">
+          <a href={PHONE_HREF} aria-label={`Call us at ${PHONE_DISPLAY}`}>
+            <Button size="lg" variant="secondary">
+              <Phone size={16} />
+              {PHONE_DISPLAY}
+            </Button>
+          </a>
+          <Link href="/book">
+            <Button size="lg">
+              Book appointment
+              <ArrowRight size={16} />
+            </Button>
+          </Link>
+        </div>
       </motion.div>
     </section>
   );

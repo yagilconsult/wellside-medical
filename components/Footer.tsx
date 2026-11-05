@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { PulseDot } from "@/components/PulseDot";
-import { HEADWAY_URL } from "@/lib/links";
+import { HEADWAY_URL, PHONE_DISPLAY, PHONE_HREF } from "@/lib/links";
 
 const quickLinks = [
   { label: "Our Services", href: "/#services" },
@@ -139,6 +139,12 @@ export function Footer() {
           <motion.div variants={revealItem}>
             <p className="text-sm font-medium mb-4">Contact Info</p>
             <ul className="space-y-3">
+              <li className="flex items-start gap-2 text-sm text-primary-foreground/75">
+                <Phone size={15} className="mt-0.5 shrink-0" />
+                <a href={PHONE_HREF} className="transition-colors hover:text-primary-foreground">
+                  {PHONE_DISPLAY}
+                </a>
+              </li>
               <li className="flex items-start gap-2 text-sm text-primary-foreground/75">
                 <Mail size={15} className="mt-0.5 shrink-0" />
                 bookings@wellsidebehavioralhealth.com

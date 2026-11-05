@@ -43,6 +43,7 @@ import {
   ChecklistCard,
 } from "@/components/landing/Cards";
 import { HEADWAY_URL } from "@/lib/links";
+import { CallButton } from "@/components/CallButton";
 
 const services = [
   {
@@ -715,6 +716,7 @@ export default function HomePage() {
 
       <ReadyCta />
       <Footer />
+      <CallButton />
     </main>
   );
 }

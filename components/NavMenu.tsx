@@ -5,8 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { PHONE_DISPLAY, PHONE_HREF } from "@/lib/links";
 
 const navLinks = [
   { label: "About", href: "/#meet-wulaimot" },
@@ -45,6 +46,14 @@ export function NavMenu() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <a
+            href={PHONE_HREF}
+            aria-label={`Call us at ${PHONE_DISPLAY}`}
+            className="hidden lg:inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          >
+            <Phone size={15} />
+            {PHONE_DISPLAY}
+          </a>
           <Link href="/book">
             <Button size="sm">Book appointment</Button>
           </Link>
@@ -60,6 +69,13 @@ export function NavMenu() {
               Sign in
             </Link>
           )}
+          <a
+            href={PHONE_HREF}
+            aria-label={`Call us at ${PHONE_DISPLAY}`}
+            className="lg:hidden flex h-11 w-11 items-center justify-center rounded-lg text-primary hover:bg-muted"
+          >
+            <Phone size={18} />
+          </a>
           <button
             onClick={() => setMobileOpen((o) => !o)}
             className="md:hidden flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
