@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-// Report-only CSP: logs violations in the browser console without blocking anything.
-// Promote to "Content-Security-Policy" once the console is clean across the key flows.
+// Enforcing CSP. If something legitimate breaks, check the browser console and add its source below.
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.daily.co",
@@ -23,7 +22,7 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=(), payment=()" },
   { key: "Strict-Transport-Security", value: "max-age=31536000" },
-  { key: "Content-Security-Policy-Report-Only", value: csp },
+  { key: "Content-Security-Policy", value: csp },
 ];
 
 const nextConfig = {
