@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { findUserByEmail, createUser } from "@/lib/db";
+import { allow, clientIp, TOO_MANY } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
+  if (!(await allow("register", clientIp(req.headers), 5, "1 h"))) {
+    return NextResponse.json({ error: TOO_MANY }, { status: 429 });
+  }
   const body = await req.json();
   const { name, email, password, phone } = body;
 

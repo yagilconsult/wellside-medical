@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAvailableSlots } from "@/lib/scheduling";
+import { allow, clientIp, TOO_MANY } from "@/lib/ratelimit";
 
 /**
  * Public on purpose — the guest booking flow needs to check availability
@@ -15,6 +16,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(req: Request) {
+  if (!(await allow("availability", clientIp(req.headers), 60, "1 m"))) {
+    return NextResponse.json({ error: TOO_MANY }, { status: 429 });
+  }
   const { searchParams } = new URL(req.url);
   const date = searchParams.get("date");
   const type = searchParams.get("type");

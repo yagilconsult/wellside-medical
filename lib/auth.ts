@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { findUserByEmail } from "@/lib/db";
+import { allow, clientIp } from "@/lib/ratelimit";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt", maxAge: 60 * 60 * 8 }, // 8 hours
@@ -15,8 +16,13 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
+
+        // Brute-force protection: per IP and per account. Returning null looks like a normal bad login.
+        const ipOk = await allow("login-ip", clientIp(req?.headers as any), 20, "10 m");
+        const acctOk = await allow("login-acct", credentials.email.toLowerCase().trim(), 8, "10 m");
+        if (!ipOk || !acctOk) return null;
 
         const user = await findUserByEmail(credentials.email);
         if (!user) return null;

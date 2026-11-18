@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import * as db from "@/lib/db";
+import { allow, TOO_MANY } from "@/lib/ratelimit";
 import { isSlotStillAvailable } from "@/lib/scheduling";
 import { APPOINTMENT_DURATIONS } from "@/lib/scheduling-constants";
 import {
@@ -85,6 +86,7 @@ export async function createAppointmentAction(input: {
 }): Promise<{ ok: boolean; error?: string }> {
   // The appointment always belongs to the signed-in patient.
   const user = await requirePatient();
+  if (!(await allow("book", user.id, 10, "1 h"))) return { ok: false, error: TOO_MANY };
 
   if (!(input.type in APPOINTMENT_DURATIONS)) {
     return { ok: false, error: "Please choose a valid appointment type." };
@@ -181,6 +183,7 @@ export async function updateAppointmentStatusAction(
 
 export async function sendMessageAction(threadUserId: string, text: string) {
   const user = await requireSession();
+  if (!(await allow("message", user.id, 30, "10 m"))) throw new Error(TOO_MANY);
 
   const body = clean(text, MAX_MESSAGE);
   if (!body) throw new Error("Message is empty");

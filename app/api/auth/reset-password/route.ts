@@ -5,8 +5,12 @@ import {
   markPasswordResetTokenUsed,
   updateUserPassword,
 } from "@/lib/db";
+import { allow, clientIp, TOO_MANY } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
+  if (!(await allow("reset", clientIp(req.headers), 10, "1 h"))) {
+    return NextResponse.json({ error: TOO_MANY }, { status: 429 });
+  }
   const { token, password } = await req.json();
 
   if (!token || !password) {

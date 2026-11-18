@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { allow, TOO_MANY } from "@/lib/ratelimit";
 
 /**
  * Handles insurance card image uploads.
@@ -20,6 +21,9 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+  if (!(await allow("upload", (session.user as any).id, 10, "1 h"))) {
+    return NextResponse.json({ error: TOO_MANY }, { status: 429 });
   }
 
   const formData = await req.formData();
