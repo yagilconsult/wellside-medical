@@ -300,6 +300,7 @@ export default function BookingFlowPage() {
                 <Field label="Email" htmlFor="email" required>
                   <Input
                     id="email"
+                    autoComplete="email"
                     type="email"
                     value={patient.email}
                     onChange={(e) => setPatient((p) => ({ ...p, email: e.target.value }))}
@@ -467,6 +468,7 @@ export default function BookingFlowPage() {
               <Field label="Password" htmlFor="password" required>
                 <Input
                   id="password"
+                  autoComplete="new-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

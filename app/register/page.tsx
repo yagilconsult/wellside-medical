@@ -88,6 +88,7 @@ export default function RegisterPage() {
             <Field label="Email" htmlFor="email">
               <Input
                 id="email"
+                autoComplete="email"
                 type="email"
                 required
                 value={form.email}
@@ -98,6 +99,7 @@ export default function RegisterPage() {
             <Field label="Phone" htmlFor="phone">
               <Input
                 id="phone"
+                autoComplete="tel"
                 value={form.phone}
                 onChange={(e) => update("phone", e.target.value)}
                 placeholder="(555) 555-0132"
@@ -106,6 +108,7 @@ export default function RegisterPage() {
             <Field label="Password" htmlFor="password">
               <Input
                 id="password"
+                autoComplete="new-password"
                 type="password"
                 required
                 minLength={8}

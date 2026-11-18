@@ -85,6 +85,7 @@ function ResetPasswordForm() {
         <Field label="New password" htmlFor="password">
           <Input
             id="password"
+            autoComplete="new-password"
             type="password"
             required
             minLength={8}
@@ -96,6 +97,7 @@ function ResetPasswordForm() {
         <Field label="Confirm new password" htmlFor="confirm">
           <Input
             id="confirm"
+            autoComplete="new-password"
             type="password"
             required
             minLength={8}

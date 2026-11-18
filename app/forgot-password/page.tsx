@@ -50,6 +50,7 @@ export default function ForgotPasswordPage() {
                 <Field label="Email" htmlFor="email">
                   <Input
                     id="email"
+                    autoComplete="email"
                     type="email"
                     required
                     value={email}
