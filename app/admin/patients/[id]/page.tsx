@@ -7,14 +7,14 @@ import { PatientDetailClient } from "@/components/admin/PatientDetailClient";
 export default async function PatientProfilePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "PROVIDER") {
     redirect("/login");
   }
 
-  const patientRow = await db.findUserById(params.id);
+  const patientRow = await db.findUserById((await params).id);
   if (!patientRow || patientRow.role !== "PATIENT") notFound();
   const patient = db.toPublicUser(patientRow);
 

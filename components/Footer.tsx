@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { PulseDot } from "@/components/PulseDot";
 import { HEADWAY_URL, PHONE_DISPLAY, PHONE_HREF } from "@/lib/links";
@@ -34,7 +34,7 @@ const revealContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07 } },
 };
-const revealItem = {
+const revealItem: Variants = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };

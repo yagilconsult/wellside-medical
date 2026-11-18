@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   Brain,
   Heart,
@@ -169,11 +169,11 @@ const heroContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
 };
-const heroItem = {
+const heroItem: Variants = {
   hidden: { opacity: 0, y: 18 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
-const heroWord = {
+const heroWord: Variants = {
   hidden: { opacity: 0, y: 14, filter: "blur(4px)" },
   show: {
     opacity: 1,
@@ -187,7 +187,7 @@ const revealContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07 } },
 };
-const revealItem = {
+const revealItem: Variants = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };

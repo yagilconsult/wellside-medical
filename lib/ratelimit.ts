@@ -1,6 +1,5 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-import { headers } from "next/headers";
 
 /**
  * Rate limiting backed by Upstash Redis (works on serverless, unlike in-memory counters).
@@ -40,15 +39,6 @@ export function clientIp(h: Headers | Record<string, unknown> | undefined): stri
   };
   const xff = get("x-forwarded-for");
   return (xff?.split(",")[0] || get("x-real-ip") || "unknown").trim();
-}
-
-/** IP of the current request, for server actions and route handlers. */
-export function currentIp(): string {
-  try {
-    return clientIp(headers());
-  } catch {
-    return "unknown";
-  }
 }
 
 /** Returns true if the request is allowed, false if the limit is exceeded. */
