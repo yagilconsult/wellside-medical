@@ -8,7 +8,7 @@ export default function HipaaNoticePage() {
   return (
     <LegalPageLayout
       title="HIPAA Notice of Privacy Practices"
-      lastUpdated="July 22, 2026"
+      lastUpdated="November 19, 2026"
     >
       <p className="text-sm text-muted-foreground leading-relaxed">
         This notice describes how medical information about you may be used
@@ -90,13 +90,6 @@ export default function HipaaNoticePage() {
         </p>
       </LegalSection>
 
-      <p className="text-xs text-muted-foreground/70 pt-4 border-t border-border">
-        This page is placeholder content for a product prototype. A HIPAA
-        Notice of Privacy Practices is a legally significant document.
-        before launch, this notice must be reviewed and finalized by
-        qualified legal/compliance counsel to ensure it accurately reflects
-        your actual practices and meets all federal and state requirements.
-      </p>
     </LegalPageLayout>
   );
 }

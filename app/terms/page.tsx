@@ -6,7 +6,7 @@ export const metadata = {
 
 export default function TermsOfServicePage() {
   return (
-    <LegalPageLayout title="Terms of Service" lastUpdated="July 22, 2026">
+    <LegalPageLayout title="Terms of Service" lastUpdated="November 19, 2026">
       <p className="text-sm text-muted-foreground leading-relaxed">
         These Terms of Service (&quot;Terms&quot;) govern your use of the
         WellSide Behavioral Health website and telehealth platform. By
@@ -89,12 +89,6 @@ export default function TermsOfServicePage() {
         </p>
       </LegalSection>
 
-      <p className="text-xs text-muted-foreground/70 pt-4 border-t border-border">
-        This page is placeholder content for a product prototype. Before
-        launch, these terms should be reviewed and finalized by qualified
-        legal counsel to ensure compliance with applicable state and federal
-        law.
-      </p>
     </LegalPageLayout>
   );
 }

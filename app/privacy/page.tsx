@@ -6,7 +6,7 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalPageLayout title="Privacy Policy" lastUpdated="July 22, 2026">
+    <LegalPageLayout title="Privacy Policy" lastUpdated="November 19, 2026">
       <p className="text-sm text-muted-foreground leading-relaxed">
         This Privacy Policy describes how WellSide Behavioral Health
         (&quot;WellSide,&quot; &quot;we,&quot; &quot;us&quot;) collects, uses,
@@ -77,12 +77,6 @@ export default function PrivacyPolicyPage() {
         </p>
       </LegalSection>
 
-      <p className="text-xs text-muted-foreground/70 pt-4 border-t border-border">
-        This page is placeholder content for a product prototype. Before
-        launch, this policy should be reviewed and finalized by qualified
-        legal counsel to ensure compliance with applicable state and federal
-        law.
-      </p>
     </LegalPageLayout>
   );
 }
