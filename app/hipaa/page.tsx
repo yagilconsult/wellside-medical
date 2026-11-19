@@ -81,10 +81,10 @@ export default function HipaaNoticePage() {
         <p>
           If you have questions about this notice, please contact us at{" "}
           <a
-            href="mailto:bookings@wellsidebehavioralhealth.com"
+            href="mailto:info@wellsidebehavioralhealth.com"
             className="text-primary underline"
           >
-            bookings@wellsidebehavioralhealth.com
+            info@wellsidebehavioralhealth.com
           </a>
           .
         </p>

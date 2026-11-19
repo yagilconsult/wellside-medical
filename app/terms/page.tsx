@@ -76,6 +76,19 @@ export default function TermsOfServicePage() {
         </p>
       </LegalSection>
 
+      <LegalSection title="8. Contact us">
+        <p>
+          Questions about these Terms can be directed to{" "}
+          <a
+            href="mailto:info@wellsidebehavioralhealth.com"
+            className="text-primary underline"
+          >
+            info@wellsidebehavioralhealth.com
+          </a>
+          .
+        </p>
+      </LegalSection>
+
       <p className="text-xs text-muted-foreground/70 pt-4 border-t border-border">
         This page is placeholder content for a product prototype. Before
         launch, these terms should be reviewed and finalized by qualified

@@ -68,10 +68,10 @@ export default function PrivacyPolicyPage() {
         <p>
           Questions about this policy can be directed to{" "}
           <a
-            href="mailto:bookings@wellsidebehavioralhealth.com"
+            href="mailto:info@wellsidebehavioralhealth.com"
             className="text-primary underline"
           >
-            bookings@wellsidebehavioralhealth.com
+            info@wellsidebehavioralhealth.com
           </a>
           .
         </p>
