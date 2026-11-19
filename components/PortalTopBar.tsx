@@ -16,11 +16,12 @@ export function PortalTopBar({
     <div className="flex items-center justify-between pb-5 mb-6 border-b border-border">
       <Link href="/" className="flex items-center gap-2.5">
         <Image
-          src="/images/logo.png"
+          src="/images/logo-mark.png"
           alt="WellSide Behavioral Health"
-          width={32}
-          height={36}
-          className="h-8 w-auto"
+          width={427}
+          height={480}
+          priority
+          className="h-10 w-auto"
         />
         <span className="font-display font-semibold text-primary hidden sm:inline">
           WellSide Behavioral Health

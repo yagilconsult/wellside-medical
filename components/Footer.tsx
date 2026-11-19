@@ -74,13 +74,15 @@ export function Footer() {
           {/* Brand */}
           <motion.div variants={revealItem}>
             <div className="flex items-center gap-2.5 mb-3">
-              <Image
-                src="/images/logo.png"
-                alt="WellSide Behavioral Health"
-                width={36}
-                height={40}
-                className="h-9 w-auto shrink-0"
-              />
+              <span className="flex shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm">
+                <Image
+                  src="/images/logo-mark.png"
+                  alt="WellSide Behavioral Health"
+                  width={427}
+                  height={480}
+                  className="h-10 w-auto"
+                />
+              </span>
               <p className="font-display font-semibold leading-tight">
                 WellSide Behavioral Health
               </p>

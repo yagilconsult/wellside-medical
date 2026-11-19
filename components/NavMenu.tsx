@@ -26,11 +26,12 @@ export function NavMenu() {
       <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-3">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/images/logo.png"
+            src="/images/logo-mark.png"
             alt="WellSide Behavioral Health"
-            width={40}
-            height={44}
-            className="h-10 w-auto"
+            width={427}
+            height={480}
+            priority
+            className="h-11 w-auto"
           />
           <span className="font-display font-semibold text-primary hidden sm:inline">
             WellSide Behavioral Health
