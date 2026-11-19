@@ -256,10 +256,10 @@ export function ChecklistCard({ title, items }: { title: string; items: string[]
 type TrustItem = { icon: LucideIcon; label: string; title: string; tag: string };
 
 function PinnedStep({ item, i, progress }: { item: TrustItem; i: number; progress: MotionValue<number> }) {
-  const a = 0.06 + i * 0.15;
-  const opacity = useTransform(progress, [a, a + 0.08], [0.35, 1]);
-  const y = useTransform(progress, [a, a + 0.08], [10, 0]);
-  const fill = useTransform(progress, [a, a + 0.08], [0, 1]);
+  const a = 0.04 + i * 0.13;
+  const opacity = useTransform(progress, [a, a + 0.07], [0.35, 1]);
+  const y = useTransform(progress, [a, a + 0.07], [10, 0]);
+  const fill = useTransform(progress, [a, a + 0.07], [0, 1]);
   return (
     <motion.li style={{ opacity, y }} className="relative text-center">
       <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-background shadow-card">
@@ -289,12 +289,12 @@ export function TrustJourney({ items }: { items: TrustItem[] }) {
   const pinned = desktop && !reduce;
   const outer = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: outer, offset: ["start start", "end end"] });
-  const line = useTransform(scrollYProgress, [0.05, 0.8], [0, 1]);
+  const line = useTransform(scrollYProgress, [0.03, 0.7], [0, 1]);
 
   return (
     <section
       ref={outer}
-      className={cn("relative overflow-clip bg-gradient-to-b from-accent to-transparent", pinned && "h-[260vh]")}
+      className={cn("relative overflow-clip bg-gradient-to-b from-accent to-transparent", pinned && "h-[180vh]")}
     >
       <Ambient className="-left-20 top-10 h-72 w-72 bg-sage/25" />
       <Ambient className="-right-16 top-40 h-64 w-64 bg-gold/15" drift={-22} duration={19} />
