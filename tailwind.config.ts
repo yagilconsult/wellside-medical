@@ -25,6 +25,9 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        gold: { DEFAULT: "hsl(var(--gold))", deep: "hsl(var(--gold-deep))" },
+        lavender: "hsl(var(--lavender))",
+        sage: "hsl(var(--sage))",
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",

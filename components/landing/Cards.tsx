@@ -1,113 +1,145 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Landing-page card system. One shared look: soft layered shadow, a hairline
- * border that tints toward the brand teal on hover, and an icon tile that
- * fills in on hover. Motion is a critically damped spring (no bounce) and
- * only transform/opacity animate.
+ * Landing-page building blocks: calm, airy, premium. Gold is used only for
+ * small accents (eyebrows, hairlines, numerals); lavender and sage appear as
+ * soft tints. Motion is one gentle reveal (once) and a quiet hover lift, both
+ * transform/opacity only. MotionProvider handles reduced motion.
  */
 
+const ease = [0.23, 1, 0.32, 1] as const;
 const lift = { type: "spring", bounce: 0, duration: 0.3 } as const;
 
-const cardBase =
-  "group relative overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card " +
-  "transition-[border-color,box-shadow] duration-300 hover:border-primary/30 hover:shadow-card-hover";
-
-/** Soft teal glow that fades in at the top of a card on hover. */
-function Glow() {
+/** Fade-up reveal, plays once when scrolled into view. */
+export function Reveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
   return (
-    <span
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 top-0 h-28 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(60%_100%_at_20%_0%,hsl(var(--primary)/0.08),transparent)]"
-    />
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, delay, ease }}
+      className={className}
+    >
+      {children}
+    </motion.div>
   );
 }
 
+/** Small-caps gold label with a hairline. */
+export function Eyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <p
+      className={cn(
+        "inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-deep",
+        className
+      )}
+    >
+      <span aria-hidden="true" className="h-px w-8 bg-gold/70" />
+      {children}
+    </p>
+  );
+}
+
+export function SectionHead({
+  eyebrow,
+  title,
+  body,
+  align = "center",
+}: {
+  eyebrow: string;
+  title: string;
+  body?: string;
+  align?: "center" | "left";
+}) {
+  return (
+    <Reveal className={cn("mb-14 max-w-2xl", align === "center" ? "mx-auto text-center" : "text-left")}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 className="mt-5 text-balance font-display text-3xl font-semibold md:text-[2.5rem]">{title}</h2>
+      {body && <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">{body}</p>}
+    </Reveal>
+  );
+}
+
+const tones = [
+  "bg-sage/20 text-primary",
+  "bg-lavender/15 text-[hsl(280_25%_38%)]",
+  "bg-gold/15 text-gold-deep",
+];
+
 export function IconTile({
   icon: Icon,
-  tone = "soft",
+  tone = 0,
   size = "md",
-  className,
 }: {
   icon: LucideIcon;
-  tone?: "soft" | "solid";
+  tone?: number;
   size?: "sm" | "md";
-  className?: string;
 }) {
   return (
     <span
       className={cn(
-        "relative inline-flex shrink-0 items-center justify-center rounded-xl transition-colors duration-200",
+        "inline-flex shrink-0 items-center justify-center rounded-full",
         size === "md" ? "h-12 w-12" : "h-10 w-10",
-        tone === "solid"
-          ? "bg-primary text-primary-foreground"
-          : "bg-accent text-primary group-hover:bg-primary group-hover:text-primary-foreground",
-        className
+        tones[tone % tones.length]
       )}
     >
-      <Icon size={size === "md" ? 21 : 18} strokeWidth={1.75} />
+      <Icon size={size === "md" ? 21 : 18} strokeWidth={1.6} />
     </span>
   );
 }
 
-/**
- * "What to expect" — solid brand cards in a descending staircase. Statement on
- * top, hairline divider, then a circle icon with a name and small-caps tag.
- * The staircase only applies from md up; below that the cards simply stack.
- */
+const cardBase =
+  "relative rounded-3xl border border-border/60 bg-card shadow-card " +
+  "transition-[border-color,box-shadow] duration-300 [@media(hover:hover)]:hover:border-gold/40 [@media(hover:hover)]:hover:shadow-card-hover";
+
+/** "What to expect": numbered steps joined by a hairline. */
 export function TrustBar({
   items,
 }: {
   items: { icon: LucideIcon; label: string; title: string; tag: string }[];
 }) {
   return (
-    <ul className="grid items-start gap-4 sm:grid-cols-2 md:grid-cols-5">
+    <ol className="relative grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+      <span
+        aria-hidden="true"
+        className="absolute left-[10%] right-[10%] top-7 hidden h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent lg:block"
+      />
       {items.map((item, i) => (
         <motion.li
           key={item.label}
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-          style={{ "--step": `${i * 28}px` } as CSSProperties}
-          className="md:mt-[var(--step)]"
+          transition={{ duration: 0.55, delay: i * 0.055, ease }}
+          className="relative text-center"
         >
-          <motion.div
-            whileHover={{ y: -4 }}
-            transition={lift}
-            className="relative flex h-full flex-col overflow-hidden rounded-2xl bg-primary p-6 text-primary-foreground shadow-card-hover"
-          >
-            {i % 2 === 1 && (
-              <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black/10" />
-            )}
-            <p className="relative text-balance font-display text-lg font-semibold leading-snug tracking-tight">
-              {item.label}
-            </p>
-            <div className="relative mt-6 flex items-center gap-3 border-t border-primary-foreground/20 pt-5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-primary">
-                <item.icon size={17} strokeWidth={1.9} />
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-medium leading-tight">{item.title}</p>
-                <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-foreground/70">
-                  {item.tag}
-                </p>
-              </div>
-            </div>
-          </motion.div>
+          <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-background shadow-card">
+            <item.icon size={20} strokeWidth={1.6} className="text-primary" />
+          </span>
+          <p className="mt-4 font-display text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-deep">
+            {String(i + 1).padStart(2, "0")} · {item.tag}
+          </p>
+          <p className="mt-2 text-balance font-display text-base font-semibold leading-snug">{item.label}</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">{item.title}</p>
         </motion.li>
       ))}
-    </ul>
+    </ol>
   );
 }
 
-/** Service card — numbered, editorial. */
 export function ServiceCard({
   icon,
   title,
@@ -120,84 +152,72 @@ export function ServiceCard({
   index: number;
 }) {
   return (
-    <motion.article
-      whileHover={{ y: -4 }}
-      transition={lift}
-      className={cn(cardBase, "h-full p-6 text-left")}
-    >
-      <Glow />
-      <span
-        aria-hidden="true"
-        className="absolute right-5 top-4 font-display text-3xl font-semibold tracking-tight text-foreground/[0.07]"
-      >
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      <IconTile icon={icon} />
-      <h3 className="relative mt-5 font-display text-lg font-semibold tracking-tight">{title}</h3>
-      <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+    <motion.article whileHover={{ y: -3 }} transition={lift} className={cn(cardBase, "h-full p-7 text-left")}>
+      <div className="flex items-start justify-between">
+        <IconTile icon={icon} tone={index} />
+        <span aria-hidden="true" className="font-display text-sm font-semibold tracking-widest text-gold/80">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      </div>
+      <h3 className="mt-6 font-display text-lg font-semibold tracking-tight">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
     </motion.article>
   );
 }
 
-/** "Why choose" — horizontal card with a solid icon tile. */
+/** "Why choose": open layout, gold hairline on top, no box. */
 export function WhyCard({
   icon,
   title,
   description,
+  index = 0,
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
+  index?: number;
 }) {
   return (
-    <motion.article
-      whileHover={{ y: -4 }}
-      transition={lift}
-      className={cn(cardBase, "flex h-full items-start gap-5 p-6 text-left")}
-    >
-      <Glow />
-      <IconTile icon={icon} tone="solid" />
-      <div className="relative">
-        <h3 className="font-display text-lg font-semibold tracking-tight">{title}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
-      </div>
-    </motion.article>
+    <article className="h-full border-t border-gold/40 pt-6 text-left">
+      <IconTile icon={icon} tone={index + 1} size="sm" />
+      <h3 className="mt-5 font-display text-lg font-semibold tracking-tight">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+    </article>
   );
 }
 
-/** Compact feature card for the telehealth section. */
 export function FeatureCard({
   icon,
   title,
   description,
+  index = 0,
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
+  index?: number;
 }) {
   return (
     <motion.article
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -3 }}
       transition={lift}
-      className={cn(cardBase, "h-full bg-card/80 p-5 text-left backdrop-blur")}
+      className={cn(cardBase, "h-full rounded-2xl bg-card/90 p-5 text-left backdrop-blur")}
     >
-      <Glow />
-      <IconTile icon={icon} size="sm" />
-      <h3 className="relative mt-4 font-display text-base font-semibold tracking-tight">{title}</h3>
-      <p className="relative mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      <IconTile icon={icon} size="sm" tone={index} />
+      <h3 className="mt-4 font-display text-base font-semibold tracking-tight">{title}</h3>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
     </motion.article>
   );
 }
 
-/** Checklist panel used in the provider profile. */
 export function ChecklistCard({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-card">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">{title}</p>
+    <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-deep">{title}</p>
       <ul className="mt-4 space-y-3">
         {items.map((item) => (
           <li key={item} className="flex items-start gap-3 text-sm">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sage/25 text-primary">
               <Check size={12} strokeWidth={2.5} />
             </span>
             <span className="text-foreground/80">{item}</span>

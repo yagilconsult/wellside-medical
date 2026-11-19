@@ -36,6 +36,9 @@ import { Footer } from "@/components/Footer";
 import { TelehealthIllustration } from "@/components/TelehealthIllustration";
 import { ReadyCta } from "@/components/ReadyCta";
 import {
+  Reveal,
+  Eyebrow,
+  SectionHead,
   TrustBar,
   ServiceCard,
   WhyCard,
@@ -195,23 +198,18 @@ const revealItem: Variants = {
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <motion.div
-      variants={revealItem}
-      className={`overflow-hidden rounded-2xl border bg-card transition-[border-color,box-shadow] duration-300 ${
-        open ? "border-primary/30 shadow-card-hover" : "border-border/70 shadow-card hover:border-primary/20"
-      }`}
-    >
+    <motion.div variants={revealItem}>
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-4 p-5 text-left transition-transform duration-100 active:scale-[0.99]"
+        className="flex w-full items-center justify-between gap-4 py-5 text-left transition-transform duration-100 active:scale-[0.99]"
       >
         <span className="font-display text-base font-semibold tracking-tight">{q}</span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ type: "spring", bounce: 0, duration: 0.3 }}
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
-            open ? "bg-primary text-primary-foreground" : "bg-accent text-primary"
+            open ? "bg-gold/20 text-gold-deep" : "bg-sage/20 text-primary"
           }`}
         >
           <ChevronDown size={16} />
@@ -220,10 +218,10 @@ function FaqItem({ q, a }: { q: string; a: string }) {
       <motion.div
         initial={false}
         animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
         className="overflow-hidden"
       >
-        <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{a}</p>
+        <p className="pb-5 pr-12 text-sm leading-relaxed text-muted-foreground">{a}</p>
       </motion.div>
     </motion.div>
   );
@@ -330,59 +328,30 @@ export default function HomePage() {
 
       <HeartbeatDivider className="bg-accent" />
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-accent via-accent/40 to-transparent">
-        {/* Fine teal dot grid that fades out toward the bottom */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(hsl(var(--primary)/0.14)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
-        />
-        {/* Soft glows: one behind the top-left of the staircase, one where it lands */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -left-24 top-0 h-80 w-80 rounded-full bg-primary/10 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-24 -right-16 h-96 w-96 rounded-full bg-primary/[0.12] blur-3xl"
-        />
-
-        <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-16">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-14 text-center"
-          >
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-              Your first visit
-            </p>
-            <h2 className="font-display text-2xl font-semibold md:text-3xl">
-              What to expect when you book with us
-            </h2>
-          </motion.div>
+      <section className="relative overflow-hidden bg-gradient-to-b from-accent via-background to-background">
+        <div className="mx-auto max-w-6xl px-6 pb-28 pt-24">
+          <SectionHead
+            eyebrow="Your first visit"
+            title="What to expect when you book with us"
+            body="Five simple steps, from booking to your first conversation."
+          />
           <TrustBar items={trustBadges} />
         </div>
       </section>
 
-      <motion.section
-        id="services"
-        variants={revealContainer}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.15 }}
-        className="mx-auto max-w-5xl px-6 py-20 text-center"
-      >
-        <motion.h2
-          variants={revealItem}
-          className="font-display text-2xl md:text-3xl font-semibold mb-3"
+      <section id="services" className="mx-auto max-w-6xl px-6 py-28">
+        <SectionHead
+          eyebrow="Services"
+          title="Comprehensive mental health services"
+          body="From a single consultation to ongoing care, every service is delivered by video visit with the same provider each time."
+        />
+        <motion.div
+          variants={revealContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          Comprehensive Mental Health Services
-        </motion.h2>
-        <motion.p variants={revealItem} className="text-muted-foreground mb-12 max-w-2xl mx-auto">
-          From a single consultation to ongoing care, every service is
-          delivered by video visit with the same provider each time.
-        </motion.p>
-        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
           {services.map((service, i) => (
             <motion.div key={service.title} variants={revealItem} className="h-full">
               <ServiceCard
@@ -393,232 +362,133 @@ export default function HomePage() {
               />
             </motion.div>
           ))}
-        </div>
-      </motion.section>
+        </motion.div>
+      </section>
 
-      <motion.section
-        id="meet-wulaimot"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.25 }}
-        className="mx-auto max-w-5xl px-6 py-20"
-      >
-        <div className="grid gap-10 md:grid-cols-2 items-center">
-          <motion.div
-            variants={{ hidden: { opacity: 0, x: -30 }, show: { opacity: 1, x: 0 } }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-2xl overflow-hidden shadow-lg"
-          >
-            <motion.div
-              animate={{ opacity: [0.2, 0.4, 0.2] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="pointer-events-none absolute -inset-4 rounded-3xl bg-primary/20 blur-2xl -z-10"
+      <section id="meet-wulaimot" className="relative overflow-hidden bg-gradient-to-br from-lavender/[0.09] via-background to-sage/[0.12]">
+        <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-28 md:grid-cols-[5fr_6fr]">
+          <Reveal className="relative mx-auto w-full max-w-md">
+            <div
               aria-hidden="true"
+              className="absolute -bottom-5 -left-5 h-full w-full rounded-[2rem] border border-gold/50"
             />
-            <motion.div whileHover={{ scale: 1.03 }} transition={{ duration: 0.4 }}>
+            <div className="relative overflow-hidden rounded-[2rem] shadow-card-hover">
               <Image
                 src="/images/wulaimot-akindele.jpg"
                 alt="Wulaimot Akindele, MSN, APRN, PMHNP"
                 width={500}
                 height={500}
-                className="w-full h-full object-cover"
+                className="aspect-[4/5] w-full object-cover"
               />
-            </motion.div>
-          </motion.div>
-          <motion.div
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
-            }}
-          >
-            <motion.h2 variants={revealItem} className="font-display text-2xl font-semibold mb-1">
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <Eyebrow>Your provider</Eyebrow>
+            <h2 className="mt-5 font-display text-3xl font-semibold md:text-[2.5rem]">
               Meet Wulaimot Akindele
-            </motion.h2>
-            <motion.p variants={revealItem} className="text-sm font-medium text-primary mb-5">
-              MSN, APRN, PMHNP
-            </motion.p>
-            <motion.p variants={revealItem} className="text-muted-foreground mb-4">
-              Wulaimot Akindele is a board-certified Psychiatric Mental
-              Health Nurse Practitioner and the founder of WellSide
-              Behavioral Health. She works with adolescents and adults on
-              the full range of what brings people to therapy, from a
-              specific diagnosis to simply not feeling like themselves
-              lately.
-            </motion.p>
-            <motion.p variants={revealItem} className="text-muted-foreground mb-4">
-              Her practice focuses on psychiatric evaluations and medication
-              management for anxiety, depression, ADHD, PTSD, bipolar
-              disorder, and other mood-related concerns.
-            </motion.p>
-            <motion.p variants={revealItem} className="text-muted-foreground mb-8">
-              She built WellSide around one goal: make sure every patient
-              feels heard in the room, not rushed through it.
-            </motion.p>
-            <motion.div variants={revealItem}>
+            </h2>
+            <p className="mt-2 text-sm font-medium text-primary">MSN, APRN, PMHNP</p>
+            <div className="mt-7 space-y-4 leading-relaxed text-muted-foreground">
+              <p>
+                Wulaimot Akindele is a board-certified Psychiatric Mental Health Nurse
+                Practitioner and the founder of WellSide Behavioral Health. She works with
+                adolescents and adults on the full range of what brings people to therapy,
+                from a specific diagnosis to simply not feeling like themselves lately.
+              </p>
+              <p>
+                Her practice focuses on psychiatric evaluations and medication management for
+                anxiety, depression, ADHD, PTSD, bipolar disorder, and other mood-related
+                concerns.
+              </p>
+              <p>
+                She built WellSide around one goal: make sure every patient feels heard in the
+                room, not rushed through it.
+              </p>
+            </div>
+            <div className="mt-9">
               <Link href="/book">
                 <Button size="lg">Schedule consultation</Button>
               </Link>
-            </motion.div>
-          </motion.div>
+            </div>
+          </Reveal>
         </div>
-      </motion.section>
+      </section>
 
       <section className="relative overflow-hidden">
-        <motion.div
-          animate={{ opacity: [0.2, 0.35, 0.2] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
-          aria-hidden="true"
-        />
-        <div className="relative mx-auto max-w-4xl px-6 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">
-              See your provider from the comfort of home
-            </h2>
-            <p className="text-muted-foreground">
-              No commute, no waiting room. Just a secure video visit when it
-              works for you.
-            </p>
-          </motion.div>
+        <div className="mx-auto max-w-5xl px-6 py-28">
+          <SectionHead
+            eyebrow="Telehealth"
+            title="See your provider from the comfort of home"
+            body="No commute, no waiting room. Just a secure video visit when it works for you."
+          />
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 30 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mx-auto max-w-2xl rounded-2xl overflow-hidden shadow-xl border border-border mb-14"
-          >
+          <Reveal className="relative mx-auto mb-16 max-w-3xl overflow-hidden rounded-[2rem] border border-border/60 shadow-card-hover">
             <div className="relative aspect-video">
               <TelehealthIllustration />
-
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className="absolute top-4 right-4 h-16 w-24 rounded-lg bg-white/20 backdrop-blur border border-white/30 flex items-center justify-center"
-              >
-                <span className="text-[10px] text-white/80 font-medium">You</span>
-              </motion.div>
-
-              <div className="absolute top-4 left-4 flex items-center gap-1.5 rounded-full bg-black/25 backdrop-blur px-2.5 py-1">
-                <motion.span
-                  animate={{ opacity: [1, 0.4, 1] }}
-                  transition={{ duration: 1.4, repeat: Infinity }}
-                  className="h-1.5 w-1.5 rounded-full bg-red-400"
-                />
-                <span className="text-[10px] text-white/90 font-medium">Live</span>
+              <div className="absolute right-4 top-4 flex h-16 w-24 items-center justify-center rounded-xl border border-white/30 bg-white/20 backdrop-blur">
+                <span className="text-[10px] font-medium text-white/80">You</span>
               </div>
-
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3">
+              <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                <span className="text-[10px] font-medium text-white/90">Live</span>
+              </div>
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-3">
                 {[Mic, Video, MessageCircle].map((Icon, i) => (
-                  <motion.div
+                  <span
                     key={i}
-                    whileHover={{ scale: 1.12 }}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur"
                   >
                     <Icon size={15} />
-                  </motion.div>
+                  </span>
                 ))}
-                <motion.div
-                  animate={{ boxShadow: ["0 0 0 0 rgba(220,38,38,0.4)", "0 0 0 8px rgba(220,38,38,0)"] }}
-                  transition={{ duration: 1.8, repeat: Infinity }}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white"
-                >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white">
                   <PhoneOff size={15} />
-                </motion.div>
+                </span>
               </div>
             </div>
-          </motion.div>
+          </Reveal>
 
           <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
             {telehealthFeatures.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="h-full"
-              >
+              <Reveal key={feature.title} delay={i * 0.055} className="h-full">
                 <FeatureCard
                   icon={feature.icon}
                   title={feature.title}
                   description={feature.description}
+                  index={i}
                 />
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="relative bg-muted overflow-hidden">
-        <motion.div
-          animate={{ transform: ["translate(0px, 0px)", "translate(20px, -15px)", "translate(0px, 0px)"] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-          className="pointer-events-none absolute -top-16 right-[-4rem] h-64 w-64 rounded-full bg-primary/10 blur-3xl"
-          aria-hidden="true"
-        />
-        <motion.div
-          variants={revealContainer}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-          className="relative mx-auto max-w-5xl px-6 py-20"
-        >
-          <motion.h2
-            variants={revealItem}
-            className="font-display text-2xl md:text-3xl font-semibold text-center mb-3"
-          >
-            Why Choose WellSide Behavioral Health
-          </motion.h2>
-          <motion.p
-            variants={revealItem}
-            className="text-muted-foreground text-center max-w-2xl mx-auto mb-12"
-          >
-            WellSide was founded by Wulaimot Akindele, a board-certified
-            Psychiatric Mental Health Nurse Practitioner, on a simple idea:
-            psychiatric care should feel personal, not clinical.
-          </motion.p>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {whyChoose.map((item) => (
-              <motion.div key={item.title} variants={revealItem} className="h-full">
-                <WhyCard icon={item.icon} title={item.title} description={item.description} />
-              </motion.div>
+      <section className="relative bg-gradient-to-b from-sage/[0.12] to-background">
+        <div className="mx-auto max-w-5xl px-6 py-28">
+          <SectionHead
+            eyebrow="Why WellSide"
+            title="Psychiatric care that feels personal, not clinical"
+            body="WellSide was founded by Wulaimot Akindele, a board-certified Psychiatric Mental Health Nurse Practitioner, on a simple idea."
+          />
+          <div className="grid gap-x-12 gap-y-12 sm:grid-cols-2">
+            {whyChoose.map((item, i) => (
+              <Reveal key={item.title} delay={(i % 2) * 0.07} className="h-full">
+                <WhyCard icon={item.icon} title={item.title} description={item.description} index={i} />
+              </Reveal>
             ))}
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-6 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10"
-        >
-          <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">
-            Our Approach to Care
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Every treatment plan starts with listening, not a checklist.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-2xl bg-muted p-8"
-        >
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-16 w-16 rounded-full overflow-hidden shrink-0">
+      <section className="mx-auto max-w-4xl px-6 py-28">
+        <SectionHead
+          eyebrow="Our approach"
+          title="Every treatment plan starts with listening"
+          body="Not a checklist."
+        />
+        <Reveal className="rounded-[2rem] border border-gold/30 bg-gradient-to-br from-accent via-background to-lavender/[0.08] p-8 md:p-10">
+          <div className="mb-8 flex items-center gap-4">
+            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full ring-2 ring-gold/50 ring-offset-2 ring-offset-background">
               <Image
                 src="/images/wulaimot-akindele.jpg"
                 alt="Wulaimot Akindele, MSN, APRN, PMHNP"
@@ -628,14 +498,13 @@ export default function HomePage() {
               />
             </div>
             <div>
-              <p className="font-medium">Wulaimot Akindele</p>
-              <p className="text-sm text-primary font-medium">MSN, APRN, PMHNP</p>
+              <p className="font-display font-semibold">Wulaimot Akindele</p>
+              <p className="text-sm font-medium text-primary">MSN, APRN, PMHNP</p>
               <p className="text-sm text-muted-foreground">
                 Founder &amp; Psychiatric Mental Health Nurse Practitioner
               </p>
             </div>
           </div>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <ChecklistCard
               title="Clinical expertise"
@@ -648,64 +517,68 @@ export default function HomePage() {
             />
             <ChecklistCard
               title="Specializations"
-              items={[
-                "Anxiety & Depression",
-                "ADHD",
-                "PTSD & Trauma",
-                "Mood Disorders & Bipolar",
-              ]}
+              items={["Anxiety & Depression", "ADHD", "PTSD & Trauma", "Mood Disorders & Bipolar"]}
             />
           </div>
-        </motion.div>
+        </Reveal>
       </section>
 
-      <motion.section
-        id="insurance"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.5 }}
-        className="mx-auto max-w-3xl px-6 py-20 text-center"
-      >
-        <h2 className="font-display text-2xl font-semibold mb-3">
-          Use your insurance or pay privately
-        </h2>
-        <p className="text-muted-foreground mb-8">
-          Insurance patients book, are billed and have their visits through
-          Headway. Prefer to pay privately, or not use your insurance? Book
-          directly here with upfront pricing and no surprise bills.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <a href={HEADWAY_URL} target="_blank" rel="noopener noreferrer">
-            <Button size="lg">Book with insurance on Headway</Button>
-          </a>
-          <Link href="/book">
-            <Button size="lg" variant="secondary">
-              Self-pay booking
-            </Button>
-          </Link>
-        </div>
-        <p className="mt-4 text-xs text-muted-foreground">
-          Insurance visits are scheduled and billed through Headway, our insurance partner.
-        </p>
-      </motion.section>
+      <section id="insurance" className="mx-auto max-w-5xl px-6 pb-28">
+        <Reveal className="relative overflow-hidden rounded-[2rem] bg-primary px-8 py-14 text-center text-primary-foreground md:px-16">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_85%_0%,hsl(var(--lavender)/0.28),transparent),radial-gradient(50%_70%_at_0%_100%,hsl(var(--gold)/0.22),transparent)]"
+          />
+          <div className="relative">
+            <p className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[hsl(37_45%_72%)]">
+              <span aria-hidden="true" className="h-px w-8 bg-[hsl(37_45%_72%)]/60" />
+              Coverage
+            </p>
+            <h2 className="mx-auto mt-5 max-w-xl text-balance font-display text-3xl font-semibold md:text-[2.25rem]">
+              Use your insurance or pay privately
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-primary-foreground/80">
+              Insurance patients book, are billed and have their visits through Headway. Prefer to
+              pay privately, or not use your insurance? Book directly here with upfront pricing and
+              no surprise bills.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={HEADWAY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center rounded-xl bg-white px-6 text-sm font-semibold text-primary shadow-card transition-transform duration-150 ease-out active:scale-[0.97]"
+              >
+                Book with insurance on Headway
+              </a>
+              <Link
+                href="/book"
+                className="inline-flex h-12 items-center rounded-xl border border-white/40 px-6 text-sm font-semibold text-white transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)]:hover:bg-white/10"
+              >
+                Self-pay booking
+              </Link>
+            </div>
+            <p className="mt-5 text-xs text-primary-foreground/60">
+              Insurance visits are scheduled and billed through Headway, our insurance partner.
+            </p>
+          </div>
+        </Reveal>
+      </section>
 
-      <section id="faq" className="bg-muted">
-        <div className="mx-auto max-w-3xl px-6 py-20">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-display text-2xl font-semibold text-center mb-10"
-          >
-            Frequently asked questions
-          </motion.h2>
+      <section id="faq" className="bg-gradient-to-b from-background to-accent/60">
+        <div className="mx-auto grid max-w-5xl gap-12 px-6 py-28 md:grid-cols-[2fr_3fr]">
+          <Reveal className="md:sticky md:top-28 md:self-start">
+            <Eyebrow>Questions</Eyebrow>
+            <h2 className="mt-5 text-balance font-display text-3xl font-semibold md:text-[2.25rem]">
+              Frequently asked questions
+            </h2>
+          </Reveal>
           <motion.div
             variants={revealContainer}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-            className="space-y-4"
+            viewport={{ once: true, amount: 0.15 }}
+            className="divide-y divide-gold/25 border-y border-gold/25"
           >
             {faqs.map((faq) => (
               <FaqItem key={faq.q} q={faq.q} a={faq.a} />

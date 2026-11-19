@@ -17,6 +17,11 @@
   --destructive: 6 78% 45%;
   --destructive-foreground: 0 0% 100%;
   --radius: 0.75rem;
+  /* Logo accents */
+  --gold: 37 34% 54%;
+  --gold-deep: 36 48% 33%;
+  --lavender: 280 22% 58%;
+  --sage: 140 17% 62%;
 }
 
 .dark {
