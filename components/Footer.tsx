@@ -163,25 +163,23 @@ export function Footer() {
 
         <motion.div
           variants={revealItem}
-          className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4"
+          className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6 text-center"
         >
-          <div className="space-y-1.5 text-center sm:text-left">
-            <p className="text-xs text-primary-foreground/60">
-              © {new Date().getFullYear()} WellSide Behavioral Health. All
-              rights reserved.
-            </p>
-            <p className="text-xs text-primary-foreground/60">
-              Designed &amp; developed by{" "}
-              <a
-                href="https://www.yagildigitalstudios.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-primary-foreground/80 underline decoration-white/30 underline-offset-4 transition-colors hover:text-primary-foreground hover:decoration-white/70"
-              >
-                Yagil Digital Studios
-              </a>
-            </p>
-          </div>
+          <p className="text-xs text-primary-foreground/60">
+            © {new Date().getFullYear()} WellSide Behavioral Health. All
+            rights reserved.
+          </p>
+          <p className="text-xs text-primary-foreground/60">
+            Designed &amp; developed by{" "}
+            <a
+              href="https://www.yagildigitalstudios.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary-foreground/80 underline decoration-white/30 underline-offset-4 transition-colors hover:text-primary-foreground hover:decoration-white/70"
+            >
+              Yagil Digital Studios
+            </a>
+          </p>
           <div className="flex items-center gap-5">
             {legalLinks.map((link) => (
               <Link
