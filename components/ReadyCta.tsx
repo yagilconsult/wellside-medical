@@ -29,17 +29,17 @@ export function ReadyCta() {
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/book"
-            className="inline-flex h-12 items-center gap-2 rounded-xl bg-primary px-7 text-sm font-semibold text-primary-foreground shadow-card transition-transform duration-150 ease-out active:scale-[0.97]"
+            className="group inline-flex h-12 items-center gap-2 rounded-xl bg-primary px-7 text-sm font-semibold text-primary-foreground shadow-card transition-transform duration-150 ease-out active:scale-[0.97]"
           >
             Book appointment
-            <ArrowRight size={16} />
+            <ArrowRight size={16} className="transition-transform duration-200 ease-out [@media(hover:hover)]:group-hover:translate-x-1" />
           </Link>
           <a
             href={PHONE_HREF}
             aria-label={`Call us at ${PHONE_DISPLAY}`}
-            className="inline-flex h-12 items-center gap-2 rounded-xl border border-gold/50 bg-card px-7 text-sm font-semibold text-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)]:hover:bg-accent"
+            className="group inline-flex h-12 items-center gap-2 rounded-xl border border-gold/50 bg-card px-7 text-sm font-semibold text-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)]:hover:bg-accent"
           >
-            <Phone size={16} />
+            <Phone size={16} className="transition-transform duration-300 ease-out [@media(hover:hover)]:group-hover:-rotate-12 [@media(hover:hover)]:group-hover:scale-110" />
             {PHONE_DISPLAY}
           </a>
         </div>

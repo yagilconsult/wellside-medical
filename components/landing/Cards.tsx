@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DrawLine, Spot, trackSpot } from "@/components/landing/Motion";
 
 /**
  * Landing-page building blocks: calm, airy, premium. Gold is used only for
@@ -47,7 +48,7 @@ export function Eyebrow({ children, className }: { children: React.ReactNode; cl
         className
       )}
     >
-      <span aria-hidden="true" className="h-px w-8 bg-gold/70" />
+      <DrawLine className="h-px w-8 bg-gold/70" />
       {children}
     </p>
   );
@@ -91,7 +92,7 @@ export function IconTile({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full",
+        "inline-flex shrink-0 items-center justify-center rounded-full transition-transform duration-300 ease-out [@media(hover:hover)]:group-hover:-rotate-6 [@media(hover:hover)]:group-hover:scale-110",
         size === "md" ? "h-12 w-12" : "h-10 w-10",
         tones[tone % tones.length]
       )}
@@ -102,7 +103,7 @@ export function IconTile({
 }
 
 const cardBase =
-  "relative rounded-3xl border border-border/60 bg-card shadow-card " +
+  "group relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-card " +
   "transition-[border-color,box-shadow] duration-300 [@media(hover:hover)]:hover:border-gold/40 [@media(hover:hover)]:hover:shadow-card-hover";
 
 /** "What to expect": numbered steps joined by a hairline. */
@@ -113,10 +114,7 @@ export function TrustBar({
 }) {
   return (
     <ol className="relative grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-      <span
-        aria-hidden="true"
-        className="absolute left-[10%] right-[10%] top-7 hidden h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent lg:block"
-      />
+      <DrawLine className="absolute left-[10%] right-[10%] top-7 hidden h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent lg:block" />
       {items.map((item, i) => (
         <motion.li
           key={item.label}
@@ -124,11 +122,17 @@ export function TrustBar({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.55, delay: i * 0.055, ease }}
-          className="relative text-center"
+          className="group relative text-center"
         >
-          <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-background shadow-card">
-            <item.icon size={20} strokeWidth={1.6} className="text-primary" />
-          </span>
+          <motion.span
+            initial={{ scale: 0.7, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ type: "spring", bounce: 0.25, duration: 0.6, delay: 0.1 + i * 0.07 }}
+            className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-background shadow-card transition-[background-color,border-color,transform] duration-300 [@media(hover:hover)]:group-hover:-translate-y-1 [@media(hover:hover)]:group-hover:border-primary [@media(hover:hover)]:group-hover:bg-primary"
+          >
+            <item.icon size={20} strokeWidth={1.6} className="text-primary transition-colors duration-300 [@media(hover:hover)]:group-hover:text-primary-foreground" />
+          </motion.span>
           <p className="mt-4 font-display text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-deep">
             {String(i + 1).padStart(2, "0")} · {item.tag}
           </p>
@@ -152,15 +156,16 @@ export function ServiceCard({
   index: number;
 }) {
   return (
-    <motion.article whileHover={{ y: -3 }} transition={lift} className={cn(cardBase, "h-full p-7 text-left")}>
-      <div className="flex items-start justify-between">
+    <motion.article onPointerMove={trackSpot} whileHover={{ y: -3 }} transition={lift} className={cn(cardBase, "h-full p-7 text-left")}>
+      <Spot />
+      <div className="relative flex items-start justify-between">
         <IconTile icon={icon} tone={index} />
-        <span aria-hidden="true" className="font-display text-sm font-semibold tracking-widest text-gold/80">
+        <span aria-hidden="true" className="font-display text-sm font-semibold tracking-widest text-gold/80 transition-transform duration-300 [@media(hover:hover)]:group-hover:-translate-y-0.5">
           {String(index + 1).padStart(2, "0")}
         </span>
       </div>
-      <h3 className="mt-6 font-display text-lg font-semibold tracking-tight">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      <h3 className="relative mt-6 font-display text-lg font-semibold tracking-tight">{title}</h3>
+      <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
     </motion.article>
   );
 }
@@ -178,10 +183,13 @@ export function WhyCard({
   index?: number;
 }) {
   return (
-    <article className="h-full border-t border-gold/40 pt-6 text-left">
+    <article className="group h-full text-left">
+      <DrawLine className="h-px w-full bg-gold/40" />
+      <div className="pt-6">
       <IconTile icon={icon} tone={index + 1} size="sm" />
       <h3 className="mt-5 font-display text-lg font-semibold tracking-tight">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      </div>
     </article>
   );
 }
@@ -199,13 +207,15 @@ export function FeatureCard({
 }) {
   return (
     <motion.article
+      onPointerMove={trackSpot}
       whileHover={{ y: -3 }}
       transition={lift}
       className={cn(cardBase, "h-full rounded-2xl bg-card/90 p-5 text-left backdrop-blur")}
     >
-      <IconTile icon={icon} size="sm" tone={index} />
-      <h3 className="mt-4 font-display text-base font-semibold tracking-tight">{title}</h3>
-      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      <Spot />
+      <div className="relative"><IconTile icon={icon} size="sm" tone={index} /></div>
+      <h3 className="relative mt-4 font-display text-base font-semibold tracking-tight">{title}</h3>
+      <p className="relative mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
     </motion.article>
   );
 }
@@ -215,13 +225,26 @@ export function ChecklistCard({ title, items }: { title: string; items: string[]
     <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
       <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-deep">{title}</p>
       <ul className="mt-4 space-y-3">
-        {items.map((item) => (
-          <li key={item} className="flex items-start gap-3 text-sm">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sage/25 text-primary">
+        {items.map((item, i) => (
+          <motion.li
+            key={item}
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.8 }}
+            transition={{ duration: 0.45, delay: i * 0.07, ease }}
+            className="flex items-start gap-3 text-sm"
+          >
+            <motion.span
+              initial={{ scale: 0.5 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true, amount: 0.8 }}
+              transition={{ type: "spring", bounce: 0.35, duration: 0.5, delay: 0.1 + i * 0.07 }}
+              className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sage/25 text-primary"
+            >
               <Check size={12} strokeWidth={2.5} />
-            </span>
+            </motion.span>
             <span className="text-foreground/80">{item}</span>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </div>

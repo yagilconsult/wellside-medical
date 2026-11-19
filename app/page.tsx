@@ -13,6 +13,7 @@ import {
   Users,
   ShieldCheck,
   Clock,
+  ArrowRight,
   Lock,
   ChevronDown,
   FileCheck,
@@ -45,6 +46,7 @@ import {
   FeatureCard,
   ChecklistCard,
 } from "@/components/landing/Cards";
+import { ScrollProgress, Ambient, Parallax } from "@/components/landing/Motion";
 import { HEADWAY_URL } from "@/lib/links";
 import { CallButton } from "@/components/CallButton";
 
@@ -231,6 +233,7 @@ export default function HomePage() {
   return (
     <main>
       <NavMenu />
+      <ScrollProgress />
 
       <section className="relative overflow-hidden text-white min-h-[600px] md:min-h-[680px] flex flex-col justify-center">
         <HeroPhotoBackground />
@@ -329,6 +332,8 @@ export default function HomePage() {
       <HeartbeatDivider className="bg-accent" />
 
       <section className="relative overflow-hidden bg-gradient-to-b from-accent via-background to-background">
+        <Ambient className="-left-20 top-10 h-72 w-72 bg-sage/25" />
+        <Ambient className="-right-16 top-40 h-64 w-64 bg-gold/15" drift={-22} duration={19} />
         <div className="mx-auto max-w-6xl px-6 pb-28 pt-24">
           <SectionHead
             eyebrow="Your first visit"
@@ -366,22 +371,33 @@ export default function HomePage() {
       </section>
 
       <section id="meet-wulaimot" className="relative overflow-hidden bg-gradient-to-br from-lavender/[0.09] via-background to-sage/[0.12]">
+        <Ambient className="-right-24 top-0 h-96 w-96 bg-lavender/20" duration={20} />
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-28 md:grid-cols-[5fr_6fr]">
-          <Reveal className="relative mx-auto w-full max-w-md">
-            <div
+          <Parallax className="relative mx-auto w-full max-w-md" distance={28}>
+            <motion.div
               aria-hidden="true"
+              initial={{ opacity: 0, x: 14, y: -14 }}
+              whileInView={{ opacity: 1, x: 0, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.9, delay: 0.25, ease: [0.23, 1, 0.32, 1] }}
               className="absolute -bottom-5 -left-5 h-full w-full rounded-[2rem] border border-gold/50"
             />
-            <div className="relative overflow-hidden rounded-[2rem] shadow-card-hover">
+            <motion.div
+              initial={{ clipPath: "inset(0 0 100% 0 round 2rem)" }}
+              whileInView={{ clipPath: "inset(0 0 0% 0 round 2rem)" }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
+              className="relative overflow-hidden rounded-[2rem] shadow-card-hover"
+            >
               <Image
                 src="/images/wulaimot-akindele.jpg"
                 alt="Wulaimot Akindele, MSN, APRN, PMHNP"
                 width={500}
                 height={500}
-                className="aspect-[4/5] w-full object-cover"
+                className="aspect-[4/5] w-full object-cover transition-transform duration-700 ease-out [@media(hover:hover)]:hover:scale-[1.03]"
               />
-            </div>
-          </Reveal>
+            </motion.div>
+          </Parallax>
           <Reveal delay={0.1}>
             <Eyebrow>Your provider</Eyebrow>
             <h2 className="mt-5 font-display text-3xl font-semibold md:text-[2.5rem]">
@@ -415,7 +431,8 @@ export default function HomePage() {
       </section>
 
       <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-5xl px-6 py-28">
+        <Ambient className="left-1/2 top-24 h-80 w-80 -translate-x-1/2 bg-lavender/15" drift={34} duration={18} />
+        <div className="relative mx-auto max-w-5xl px-6 py-28">
           <SectionHead
             eyebrow="Telehealth"
             title="See your provider from the comfort of home"
@@ -425,26 +442,52 @@ export default function HomePage() {
           <Reveal className="relative mx-auto mb-16 max-w-3xl overflow-hidden rounded-[2rem] border border-border/60 shadow-card-hover">
             <div className="relative aspect-video">
               <TelehealthIllustration />
-              <div className="absolute right-4 top-4 flex h-16 w-24 items-center justify-center rounded-xl border border-white/30 bg-white/20 backdrop-blur">
+              <motion.div
+                initial={{ opacity: 0, x: 24, scale: 0.92 }}
+                whileInView={{ opacity: 1, x: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", bounce: 0, duration: 0.7, delay: 0.5 }}
+                className="absolute right-4 top-4 flex h-16 w-24 items-center justify-center rounded-xl border border-white/30 bg-white/20 backdrop-blur"
+              >
                 <span className="text-[10px] font-medium text-white/80">You</span>
-              </div>
+              </motion.div>
               <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                <motion.span
+                  animate={{ opacity: [1, 0.35, 1] }}
+                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                  className="h-1.5 w-1.5 rounded-full bg-red-400"
+                />
                 <span className="text-[10px] font-medium text-white/90">Live</span>
               </div>
-              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-3">
+              <motion.div
+                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.7 } } }}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-3"
+              >
                 {[Mic, Video, MessageCircle].map((Icon, i) => (
-                  <span
+                  <motion.span
                     key={i}
+                    variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ scale: 0.92 }}
+                    transition={{ type: "spring", bounce: 0, duration: 0.3 }}
                     className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur"
                   >
                     <Icon size={15} />
-                  </span>
+                  </motion.span>
                 ))}
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white">
+                <motion.span
+                  variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+                  whileHover={{ y: -3 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white"
+                >
                   <PhoneOff size={15} />
-                </span>
-              </div>
+                </motion.span>
+              </motion.div>
             </div>
           </Reveal>
 
@@ -463,8 +506,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative bg-gradient-to-b from-sage/[0.12] to-background">
-        <div className="mx-auto max-w-5xl px-6 py-28">
+      <section className="relative overflow-hidden bg-gradient-to-b from-sage/[0.12] to-background">
+        <Ambient className="-left-24 bottom-0 h-72 w-72 bg-gold/15" duration={21} />
+        <div className="relative mx-auto max-w-5xl px-6 py-28">
           <SectionHead
             eyebrow="Why WellSide"
             title="Psychiatric care that feels personal, not clinical"
@@ -525,10 +569,8 @@ export default function HomePage() {
 
       <section id="insurance" className="mx-auto max-w-5xl px-6 pb-28">
         <Reveal className="relative overflow-hidden rounded-[2rem] bg-primary px-8 py-14 text-center text-primary-foreground md:px-16">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_85%_0%,hsl(var(--lavender)/0.28),transparent),radial-gradient(50%_70%_at_0%_100%,hsl(var(--gold)/0.22),transparent)]"
-          />
+          <Ambient className="-right-20 -top-24 h-72 w-72 bg-lavender/30" drift={24} duration={15} />
+          <Ambient className="-bottom-24 -left-16 h-72 w-72 bg-gold/25" drift={-24} duration={18} />
           <div className="relative">
             <p className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[hsl(37_45%_72%)]">
               <span aria-hidden="true" className="h-px w-8 bg-[hsl(37_45%_72%)]/60" />
@@ -547,9 +589,10 @@ export default function HomePage() {
                 href={HEADWAY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-12 items-center rounded-xl bg-white px-6 text-sm font-semibold text-primary shadow-card transition-transform duration-150 ease-out active:scale-[0.97]"
+                className="group inline-flex h-12 items-center rounded-xl bg-white px-6 text-sm font-semibold text-primary shadow-card transition-transform duration-150 ease-out active:scale-[0.97]"
               >
                 Book with insurance on Headway
+                <ArrowRight size={16} className="ml-2 transition-transform duration-200 ease-out [@media(hover:hover)]:group-hover:translate-x-1" />
               </a>
               <Link
                 href="/book"
