@@ -12,24 +12,26 @@ import {
   CreditCard,
   FileText,
   User,
-  CalendarClock,
   Wallet,
   ClipboardCheck,
   CheckCircle2,
   Plus,
   Video,
+  CalendarPlus,
+  ChevronRight,
 } from "lucide-react";
 import { PortalSidebar, PortalNavItem } from "@/components/PortalSidebar";
 import { PortalTopBar } from "@/components/PortalTopBar";
 import { PortalWelcomeCard } from "@/components/PortalWelcomeCard";
 import { LogoutButton } from "@/components/LogoutButton";
-import { Card, SoftCard } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { EditProfileModal } from "@/components/EditProfileModal";
 import { MessageThread, ThreadMessage } from "@/components/MessageThread";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { useToast, Toast } from "@/components/Toast";
+import { fmtTime, fmtLongDate, fmtShortDate, monthDay, relativeDay } from "@/lib/format";
 import type { PublicUser as DbUser, Appointment, InsuranceInfo, ConsentForm } from "@/lib/db";
 import {
   updateProfileAction,
@@ -48,36 +50,89 @@ const navItems: PortalNavItem[] = [
   { key: "profile", label: "Profile", icon: User },
 ];
 
-const metricVariants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0 },
+type Tone = "neutral" | "success" | "warning";
+
+const toneIcon: Record<Tone, string> = {
+  neutral: "bg-accent text-primary",
+  success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  warning: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
 };
 
-function Metric({
+/** Calendar-style date tile: "JUL / 30". */
+function DateBlock({ date, small = false }: { date: string; small?: boolean }) {
+  const { month, day } = monthDay(date);
+  return (
+    <div
+      className={`flex shrink-0 flex-col items-center justify-center rounded-xl bg-accent text-accent-foreground ${
+        small ? "h-12 w-12" : "h-16 w-16"
+      }`}
+    >
+      <span className={`font-medium uppercase tracking-wide ${small ? "text-[10px]" : "text-xs"}`}>{month}</span>
+      <span className={`font-display font-semibold leading-none ${small ? "text-lg" : "text-2xl"}`}>{day}</span>
+    </div>
+  );
+}
+
+/** Small tappable status tile that jumps to the related tab. */
+function StatusTile({
+  icon: Icon,
   label,
   value,
-  icon: Icon,
+  hint,
   tone = "neutral",
+  onClick,
 }: {
+  icon: React.ComponentType<{ size?: number | string; className?: string }>;
   label: string;
   value: string;
-  icon: React.ComponentType<{ size?: number | string; className?: string }>;
-  tone?: "neutral" | "success" | "warning";
+  hint: string;
+  tone?: Tone;
+  onClick: () => void;
 }) {
-  const toneClasses = {
-    neutral: "bg-accent text-primary",
-    success: "bg-emerald-500/10 text-emerald-600",
-    warning: "bg-amber-500/10 text-amber-600",
-  };
   return (
-    <motion.div variants={metricVariants} className="rounded-lg bg-muted p-4">
-      <div className={`mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg ${toneClasses[tone]}`}>
-        <Icon size={15} />
+    <button
+      type="button"
+      onClick={onClick}
+      className="group rounded-2xl border border-border bg-card p-4 text-left shadow-card transition-all duration-200 hover:shadow-card-hover active:scale-[0.98]"
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${toneIcon[tone]}`}>
+          <Icon size={17} />
+        </div>
+        <ChevronRight size={16} className="text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" />
       </div>
-      <p className="text-xs text-muted-foreground mb-1">{label}</p>
-      <p className="text-lg font-medium">{value}</p>
-    </motion.div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="font-display text-lg font-semibold leading-tight">{value}</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>
+    </button>
   );
+}
+
+function EmptyState({
+  icon: Icon,
+  title,
+  hint,
+  children,
+}: {
+  icon: React.ComponentType<{ size?: number | string; className?: string }>;
+  title: string;
+  hint?: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center px-4 py-8 text-center">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-primary">
+        <Icon size={22} />
+      </div>
+      <p className="font-medium">{title}</p>
+      {hint && <p className="mt-1 max-w-xs text-sm text-muted-foreground">{hint}</p>}
+      {children && <div className="mt-4">{children}</div>}
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="mb-4 font-display text-xl font-semibold">{children}</h2>;
 }
 
 const consentLabels: Record<string, string> = {
@@ -235,108 +290,196 @@ export function PatientPortalClient({
                     detail={`Patient since ${memberSince}`}
                     initials={initials}
                   />
-                  <motion.div
-                    variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-                    initial="hidden"
-                    animate="show"
-                    className="grid grid-cols-2 sm:grid-cols-4 gap-3"
-                  >
-                    <Metric
-                      icon={CalendarClock}
-                      label="Upcoming appointment"
-                      value={upcoming ? `${upcoming.date} ${upcoming.time}` : "None scheduled"}
-                    />
-                    <Metric icon={Wallet} label="Outstanding balance" value={outstandingBalance} />
-                    <Metric
-                      icon={ShieldCheck}
-                      tone={insurance?.status === "VERIFIED" ? "success" : "warning"}
-                      label="Insurance status"
-                      value={insurance ? insurance.status : "Not on file"}
-                    />
-                    <Metric
-                      icon={consentsComplete ? CheckCircle2 : ClipboardCheck}
-                      tone={consentsComplete ? "success" : "warning"}
-                      label="Intake status"
-                      value={consentsComplete ? "Complete" : "Action needed"}
-                    />
-                  </motion.div>
-                  <Card className="p-4 flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Ready for your next visit?
-                    </p>
-                    <Link href="/portal/book">
-                      <Button size="sm">
-                        <Plus size={14} />
-                        Book another appointment
-                      </Button>
-                    </Link>
-                  </Card>
+
                   {!consentsComplete && (
-                    <SoftCard className="p-4 flex items-center justify-between">
-                      <p className="text-sm">
-                        Your intake forms and consents are incomplete.
-                      </p>
-                      <Link href="/intake">
-                        <Button size="sm">Complete intake</Button>
-                      </Link>
-                    </SoftCard>
-                  )}
-                  <Card className="p-4">
-                    <p className="font-medium text-sm mb-3">Recent activity</p>
-                    <div className="space-y-2.5">
-                      {completed.length > 0 ? (
-                        completed.slice(0, 3).map((a) => (
-                          <div key={a.id} className="flex items-center gap-2.5 text-sm">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-primary shrink-0">
-                              <CheckCircle2 size={13} />
-                            </div>
-                            <span className="text-muted-foreground">
-                              Completed visit on {a.date}
-                            </span>
-                          </div>
-                        ))
-                      ) : (
+                    <div className="flex flex-col gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 sm:flex-row sm:items-center">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                        <ClipboardCheck size={22} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-display text-base font-semibold">Finish your intake forms</p>
                         <p className="text-sm text-muted-foreground">
-                          No completed visits yet. Your history will appear here.
+                          We need these signed before your first visit. It only takes a few minutes.
                         </p>
+                      </div>
+                      <Link href="/intake">
+                        <Button size="sm" className="w-full sm:w-auto">Complete intake</Button>
+                      </Link>
+                    </div>
+                  )}
+
+                  <Card className="p-5">
+                    <div className="mb-4 flex items-center justify-between">
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Your next visit
+                      </p>
+                      {upcoming && (
+                        <Link href="/portal/book" className="text-sm font-medium text-primary hover:underline">
+                          Book another
+                        </Link>
                       )}
                     </div>
+                    {upcoming ? (
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <DateBlock date={upcoming.date} />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-display text-lg font-semibold leading-snug">{upcoming.type}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {fmtLongDate(upcoming.date)} at {fmtTime(upcoming.time)}
+                          </p>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <Badge tone={upcoming.status === "CONFIRMED" ? "success" : "warning"}>
+                              {upcoming.status === "CONFIRMED" ? "Confirmed" : "Awaiting confirmation"}
+                            </Badge>
+                            {relativeDay(upcoming.date) && (
+                              <span className="text-xs text-muted-foreground">{relativeDay(upcoming.date)}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {upcoming.status === "CONFIRMED" && (
+                            <Link href={`/video/${upcoming.id}`} target="_blank">
+                              <Button size="sm">
+                                <Video size={14} />
+                                Join video visit
+                              </Button>
+                            </Link>
+                          )}
+                          <Button size="sm" variant="secondary" onClick={() => setActive("appointments")}>
+                            Manage
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <EmptyState
+                        icon={CalendarPlus}
+                        title="No visit scheduled"
+                        hint="Pick a time that works for you. Appointments are held over secure video."
+                      >
+                        <Link href="/portal/book">
+                          <Button size="sm">
+                            <Plus size={14} />
+                            Book an appointment
+                          </Button>
+                        </Link>
+                      </EmptyState>
+                    )}
+                  </Card>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <StatusTile
+                      icon={ShieldCheck}
+                      label="Insurance"
+                      value={
+                        !insurance
+                          ? "Not on file"
+                          : insurance.status === "VERIFIED"
+                          ? "Verified"
+                          : insurance.status === "REJECTED"
+                          ? "Needs attention"
+                          : "Under review"
+                      }
+                      hint={
+                        !insurance
+                          ? "Paying self-pay"
+                          : insurance.status === "VERIFIED"
+                          ? "Coverage confirmed"
+                          : insurance.status === "REJECTED"
+                          ? "Please update your card"
+                          : "We'll confirm before your visit"
+                      }
+                      tone={insurance?.status === "VERIFIED" ? "success" : insurance ? "warning" : "neutral"}
+                      onClick={() => setActive("insurance")}
+                    />
+                    <StatusTile
+                      icon={Wallet}
+                      label="Balance"
+                      value={outstandingBalance}
+                      hint={upcoming ? "Due at your visit" : "Nothing due"}
+                      onClick={() => setActive("billing")}
+                    />
+                    <StatusTile
+                      icon={consentsComplete ? CheckCircle2 : ClipboardCheck}
+                      label="Intake forms"
+                      value={consentsComplete ? "Complete" : "Incomplete"}
+                      hint={consentsComplete ? "All forms signed" : "Action needed"}
+                      tone={consentsComplete ? "success" : "warning"}
+                      onClick={() => setActive("documents")}
+                    />
+                  </div>
+
+                  <Card className="p-5">
+                    <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Recent activity
+                    </p>
+                    {completed.length > 0 ? (
+                      <div className="divide-y divide-border">
+                        {completed.slice(0, 3).map((a) => (
+                          <div key={a.id} className="flex items-center gap-3 py-2.5 text-sm">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
+                              <CheckCircle2 size={15} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium">{a.type}</p>
+                              <p className="text-xs text-muted-foreground">Completed {fmtShortDate(a.date)}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="py-3 text-sm text-muted-foreground">
+                        Your completed visits will show up here.
+                      </p>
+                    )}
                   </Card>
                 </div>
               )}
 
               {active === "appointments" && (
                 <div className="space-y-6">
-                  <div className="flex justify-end">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-display text-xl font-semibold">Appointments</h2>
                     <Link href="/portal/book">
                       <Button size="sm">
                         <Plus size={14} />
-                        Book another appointment
+                        Book another
                       </Button>
                     </Link>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm mb-2">Upcoming</p>
+
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Upcoming</p>
                     {appointments
                       .filter((a) => a.status === "CONFIRMED" || a.status === "REQUESTED")
                       .map((a) => (
-                        <Card key={a.id} className="p-4 flex justify-between items-center mb-2">
-                          <span className="text-sm">
-                            {a.type} · {a.date} {a.time}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <Badge tone={a.status === "CONFIRMED" ? "success" : "warning"}>
-                              {a.status === "CONFIRMED" ? "Confirmed" : "Requested"}
+                        <Card key={a.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+                          <DateBlock date={a.date} small />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium">{a.type}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {fmtLongDate(a.date)} at {fmtTime(a.time)}
+                            </p>
+                            <Badge tone={a.status === "CONFIRMED" ? "success" : "warning"} className="mt-1.5">
+                              {a.status === "CONFIRMED" ? "Confirmed" : "Awaiting confirmation"}
                             </Badge>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
                             {a.status === "CONFIRMED" && (
                               <Link href={`/video/${a.id}`} target="_blank">
                                 <Button size="sm">
                                   <Video size={14} />
-                                  Join video visit
+                                  Join
                                 </Button>
                               </Link>
                             )}
-                            <Button size="sm" variant="secondary" onClick={() => showToast("Reschedule request sent")}>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => {
+                                setActive("messages");
+                                showToast("Message your provider with a time that works better");
+                              }}
+                            >
                               Reschedule
                             </Button>
                             <Button
@@ -351,113 +494,174 @@ export function PatientPortalClient({
                         </Card>
                       ))}
                     {appointments.filter((a) => a.status === "CONFIRMED" || a.status === "REQUESTED").length === 0 && (
-                      <p className="text-sm text-muted-foreground">No upcoming appointments.</p>
+                      <Card>
+                        <EmptyState icon={CalendarPlus} title="No upcoming appointments" hint="Book a time whenever you're ready." />
+                      </Card>
                     )}
                   </div>
-                  <div>
-                    <p className="font-medium text-sm mb-2">Past</p>
-                    {[...completed, ...appointments.filter((a) => a.status === "CANCELLED")].map((a) => (
-                      <Card key={a.id} className="p-4 flex justify-between items-center mb-2">
-                        <span className="text-sm">
-                          {a.type} · {a.date} {a.time}
-                        </span>
-                        <Badge tone={a.status === "CANCELLED" ? "danger" : "neutral"}>
-                          {a.status === "CANCELLED" ? "Cancelled" : "Completed"}
-                        </Badge>
-                      </Card>
-                    ))}
-                  </div>
+
+                  {(completed.length > 0 || appointments.some((a) => a.status === "CANCELLED")) && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Past</p>
+                      {[...completed, ...appointments.filter((a) => a.status === "CANCELLED")].map((a) => (
+                        <Card key={a.id} className="flex items-center gap-3 p-4">
+                          <DateBlock date={a.date} small />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium">{a.type}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {fmtShortDate(a.date)} at {fmtTime(a.time)}
+                            </p>
+                          </div>
+                          <Badge tone={a.status === "CANCELLED" ? "danger" : "neutral"}>
+                            {a.status === "CANCELLED" ? "Cancelled" : "Completed"}
+                          </Badge>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
               {active === "messages" && (
-                <MessageThread
-                  otherPartyName="Wulaimot Akindele"
-                  otherPartyInitials="WA"
-                  messages={messages}
-                  onSend={handleSend}
-                />
+                <div>
+                  <SectionTitle>Messages</SectionTitle>
+                  <MessageThread
+                    otherPartyName="Wulaimot Akindele"
+                    otherPartyInitials="WA"
+                    messages={messages}
+                    onSend={handleSend}
+                  />
+                </div>
               )}
 
               {active === "insurance" && (
-                <div className="space-y-4">
-                  <SoftCard className="p-4 flex items-center gap-2 text-primary font-medium text-sm">
-                    <ShieldCheck size={16} />
-                    {insurance
-                      ? `${insurance.status.charAt(0) + insurance.status.slice(1).toLowerCase()} · ${insurance.company}${insurance.plan ? " " + insurance.plan : ""}`
-                      : "No insurance on file"}
-                  </SoftCard>
-                  <Button variant="secondary" onClick={() => setInsuranceUploadOpen(true)}>
-                    Update insurance card
-                  </Button>
+                <div>
+                  <SectionTitle>Insurance</SectionTitle>
+                  <Card className="p-5">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+                          insurance?.status === "VERIFIED" ? toneIcon.success : insurance ? toneIcon.warning : toneIcon.neutral
+                        }`}
+                      >
+                        <ShieldCheck size={22} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium">
+                          {insurance ? `${insurance.company}${insurance.plan ? " " + insurance.plan : ""}` : "No insurance on file"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {!insurance
+                            ? "You're set up as self-pay. Add a card if you'd like us to review your coverage."
+                            : insurance.status === "VERIFIED"
+                            ? "Coverage confirmed"
+                            : insurance.status === "REJECTED"
+                            ? "We couldn't verify this card. Please upload a clearer photo."
+                            : "Under review. We'll confirm before your visit."}
+                        </p>
+                      </div>
+                      {insurance && (
+                        <Badge tone={insurance.status === "VERIFIED" ? "success" : insurance.status === "REJECTED" ? "danger" : "warning"}>
+                          {insurance.status === "VERIFIED" ? "Verified" : insurance.status === "REJECTED" ? "Needs attention" : "Under review"}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="mt-5">
+                      <Button variant="secondary" onClick={() => setInsuranceUploadOpen(true)}>
+                        {insurance ? "Update insurance card" : "Add insurance card"}
+                      </Button>
+                    </div>
+                  </Card>
                 </div>
               )}
 
               {active === "billing" && (
-                <div className="divide-y divide-border">
-                  {completed.map((a) => (
-                    <div key={a.id} className="flex justify-between text-sm py-3 items-center">
-                      <span className="text-muted-foreground">
-                        {a.date} visit copay
-                      </span>
-                      <div className="flex items-center gap-3">
-                        <span>$30.00</span>
-                        <button onClick={() => showToast("Receipt downloaded")} className="text-xs underline text-primary">
-                          Receipt
-                        </button>
+                <div>
+                  <SectionTitle>Billing</SectionTitle>
+                  <Card className="overflow-hidden">
+                    {completed.length > 0 ? (
+                      <div className="divide-y divide-border">
+                        {completed.map((a) => (
+                          <div key={a.id} className="flex items-center justify-between px-5 py-3.5 text-sm">
+                            <div>
+                              <p className="font-medium">{a.type}</p>
+                              <p className="text-xs text-muted-foreground">{fmtShortDate(a.date)}</p>
+                            </div>
+                            <span className="font-medium">$30.00</span>
+                          </div>
+                        ))}
                       </div>
+                    ) : (
+                      <EmptyState icon={Wallet} title="No charges yet" hint="Charges for completed visits will appear here." />
+                    )}
+                    <div className="flex items-center justify-between border-t border-border bg-muted px-5 py-4">
+                      <span className="font-medium">Outstanding balance</span>
+                      <span className="font-display text-lg font-semibold">{outstandingBalance}</span>
                     </div>
-                  ))}
-                  <div className="flex justify-between text-base font-medium py-3">
-                    <span>Outstanding balance</span>
-                    <span>{outstandingBalance}</span>
-                  </div>
+                  </Card>
                 </div>
               )}
 
               {active === "documents" && (
-                <div className="divide-y divide-border">
-                  {(["HIPAA", "TELEHEALTH", "FINANCIAL"] as const).map((type) => {
-                    const consent = consents.find((c) => c.type === type);
-                    return (
-                      <div key={type} className="flex justify-between text-sm py-3 items-center">
-                        <span className="text-muted-foreground">{consentLabels[type]}</span>
-                        {consent ? (
-                          <Badge tone="success">
-                            Signed {new Date(consent.signedAt).toLocaleDateString()}
-                          </Badge>
-                        ) : (
-                          <Link href="/intake" className="text-xs underline text-primary">
-                            Sign now
-                          </Link>
-                        )}
-                      </div>
-                    );
-                  })}
+                <div>
+                  <SectionTitle>Documents</SectionTitle>
+                  <Card className="divide-y divide-border">
+                    {(["HIPAA", "TELEHEALTH", "FINANCIAL"] as const).map((type) => {
+                      const consent = consents.find((c) => c.type === type);
+                      return (
+                        <div key={type} className="flex items-center gap-3 px-5 py-4">
+                          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${consent ? toneIcon.success : toneIcon.warning}`}>
+                            <FileText size={18} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium">{consentLabels[type]}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {consent ? `Signed ${fmtShortDate(consent.signedAt.slice(0, 10))}` : "Not signed yet"}
+                            </p>
+                          </div>
+                          {consent ? (
+                            <Badge tone="success">Signed</Badge>
+                          ) : (
+                            <Link href="/intake">
+                              <Button size="sm">Sign now</Button>
+                            </Link>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </Card>
                 </div>
               )}
 
               {active === "profile" && (
                 <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="h-11 w-11 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-medium">
-                      {initials}
+                  <SectionTitle>Profile</SectionTitle>
+                  <Card className="p-5">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent text-lg font-semibold text-accent-foreground">
+                        {initials}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-display text-lg font-semibold">{user.name}</p>
+                        <p className="text-sm text-muted-foreground">Patient since {memberSince}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                      <p className="text-sm text-muted-foreground">{user.phone}</p>
+                    <dl className="mt-5 divide-y divide-border rounded-xl border border-border text-sm">
+                      <div className="flex justify-between gap-4 px-4 py-3">
+                        <dt className="text-muted-foreground">Email</dt>
+                        <dd className="truncate font-medium">{user.email}</dd>
+                      </div>
+                      <div className="flex justify-between gap-4 px-4 py-3">
+                        <dt className="text-muted-foreground">Phone</dt>
+                        <dd className="font-medium">{user.phone || "Not added"}</dd>
+                      </div>
+                    </dl>
+                    <div className="mt-5">
+                      <Button variant="secondary" onClick={() => setProfileOpen(true)}>
+                        Edit profile
+                      </Button>
                     </div>
-                  </div>
-                  <div className="rounded-lg bg-muted px-4 py-3 mb-4 inline-block">
-                    <p className="text-xs text-muted-foreground">Patient since</p>
-                    <p className="text-sm font-medium">{memberSince}</p>
-                  </div>
-                  <div>
-                    <Button variant="secondary" onClick={() => setProfileOpen(true)}>
-                      Edit profile
-                    </Button>
-                  </div>
+                  </Card>
                 </div>
               )}
             </motion.div>
