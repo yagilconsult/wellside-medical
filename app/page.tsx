@@ -383,11 +383,18 @@ export default function HomePage() {
               className="absolute -bottom-5 -left-5 h-full w-full rounded-[2rem] border border-gold/50"
             />
             <motion.div
-              initial={{ clipPath: "inset(0 0 100% 0 round 2rem)" }}
-              whileInView={{ clipPath: "inset(0 0 0% 0 round 2rem)" }}
-              viewport={{ once: true, amount: 0.3 }}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.25 }}
+              className="relative rounded-[2rem] shadow-card-hover"
+            >
+            <motion.div
+              variants={{
+                hidden: { clipPath: "inset(0 0 100% 0 round 2rem)" },
+                show: { clipPath: "inset(0 0 0% 0 round 2rem)" },
+              }}
               transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
-              className="relative overflow-hidden rounded-[2rem] shadow-card-hover"
+              className="relative overflow-hidden rounded-[2rem]"
             >
               <Image
                 src="/images/wulaimot-akindele.jpg"
@@ -396,6 +403,7 @@ export default function HomePage() {
                 height={500}
                 className="aspect-[4/5] w-full object-cover transition-transform duration-700 ease-out [@media(hover:hover)]:hover:scale-[1.03]"
               />
+            </motion.div>
             </motion.div>
           </Parallax>
           <Reveal delay={0.1}>
