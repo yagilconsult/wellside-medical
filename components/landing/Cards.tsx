@@ -1,10 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import type { MotionValue } from "framer-motion";
 import { Check } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DrawLine, Spot, trackSpot } from "@/components/landing/Motion";
+import { Ambient, DrawLine, Spot, trackSpot, useMediaQuery } from "@/components/landing/Motion";
 
 /**
  * Landing-page building blocks: calm, airy, premium. Gold is used only for
@@ -248,5 +250,81 @@ export function ChecklistCard({ title, items }: { title: string; items: string[]
         ))}
       </ul>
     </div>
+  );
+}
+
+type TrustItem = { icon: LucideIcon; label: string; title: string; tag: string };
+
+function PinnedStep({ item, i, progress }: { item: TrustItem; i: number; progress: MotionValue<number> }) {
+  const a = 0.06 + i * 0.15;
+  const opacity = useTransform(progress, [a, a + 0.08], [0.35, 1]);
+  const y = useTransform(progress, [a, a + 0.08], [10, 0]);
+  const fill = useTransform(progress, [a, a + 0.08], [0, 1]);
+  return (
+    <motion.li style={{ opacity, y }} className="relative text-center">
+      <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-background shadow-card">
+        <motion.span style={{ opacity: fill }} className="absolute inset-0 rounded-full bg-primary" />
+        <item.icon size={20} strokeWidth={1.6} className="relative text-primary" />
+        <motion.span style={{ opacity: fill }} className="absolute inset-0 flex items-center justify-center text-primary-foreground">
+          <item.icon size={20} strokeWidth={1.6} />
+        </motion.span>
+      </span>
+      <p className="mt-4 font-display text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-deep">
+        {String(i + 1).padStart(2, "0")} · {item.tag}
+      </p>
+      <p className="mt-2 text-balance font-display text-base font-semibold leading-snug">{item.label}</p>
+      <p className="mt-1.5 text-sm text-muted-foreground">{item.title}</p>
+    </motion.li>
+  );
+}
+
+/**
+ * "What to expect". On desktop the section pins to the screen while you scroll
+ * and the five steps light up one by one along a gold line. On phones, and
+ * with reduced motion, it falls back to the plain stacked layout.
+ */
+export function TrustJourney({ items }: { items: TrustItem[] }) {
+  const desktop = useMediaQuery("(min-width: 1024px)");
+  const reduce = useReducedMotion();
+  const pinned = desktop && !reduce;
+  const outer = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: outer, offset: ["start start", "end end"] });
+  const line = useTransform(scrollYProgress, [0.05, 0.8], [0, 1]);
+
+  return (
+    <section
+      ref={outer}
+      className={cn("relative overflow-clip bg-gradient-to-b from-accent to-transparent", pinned && "h-[260vh]")}
+    >
+      <Ambient className="-left-20 top-10 h-72 w-72 bg-sage/25" />
+      <Ambient className="-right-16 top-40 h-64 w-64 bg-gold/15" drift={-22} duration={19} />
+      <div
+        className={cn(
+          "relative mx-auto max-w-6xl px-6",
+          pinned ? "sticky top-0 flex min-h-screen flex-col justify-center py-16" : "pb-28 pt-24"
+        )}
+      >
+        <SectionHead
+          eyebrow="Your first visit"
+          title="What to expect when you book with us"
+          body="Five simple steps, from booking to your first conversation."
+        />
+        {pinned ? (
+          <ol className="relative grid grid-cols-5 gap-5">
+            <span aria-hidden="true" className="absolute left-[10%] right-[10%] top-7 h-px bg-gold/20" />
+            <motion.span
+              aria-hidden="true"
+              style={{ scaleX: line }}
+              className="absolute left-[10%] right-[10%] top-7 h-px origin-left bg-gold"
+            />
+            {items.map((item, i) => (
+              <PinnedStep key={item.label} item={item} i={i} progress={scrollYProgress} />
+            ))}
+          </ol>
+        ) : (
+          <TrustBar items={items} />
+        )}
+      </div>
+    </section>
   );
 }

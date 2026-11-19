@@ -40,13 +40,13 @@ import {
   Reveal,
   Eyebrow,
   SectionHead,
-  TrustBar,
+  TrustJourney,
   ServiceCard,
   WhyCard,
   FeatureCard,
   ChecklistCard,
 } from "@/components/landing/Cards";
-import { ScrollProgress, Ambient, Parallax } from "@/components/landing/Motion";
+import { ScrollProgress, Ambient, Parallax, ColorShift, ScrollText } from "@/components/landing/Motion";
 import { HEADWAY_URL } from "@/lib/links";
 import { CallButton } from "@/components/CallButton";
 
@@ -234,6 +234,7 @@ export default function HomePage() {
     <main>
       <NavMenu />
       <ScrollProgress />
+      <ColorShift />
 
       <section className="relative overflow-hidden text-white min-h-[600px] md:min-h-[680px] flex flex-col justify-center">
         <HeroPhotoBackground />
@@ -331,18 +332,7 @@ export default function HomePage() {
 
       <HeartbeatDivider className="bg-accent" />
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-accent via-background to-background">
-        <Ambient className="-left-20 top-10 h-72 w-72 bg-sage/25" />
-        <Ambient className="-right-16 top-40 h-64 w-64 bg-gold/15" drift={-22} duration={19} />
-        <div className="mx-auto max-w-6xl px-6 pb-28 pt-24">
-          <SectionHead
-            eyebrow="Your first visit"
-            title="What to expect when you book with us"
-            body="Five simple steps, from booking to your first conversation."
-          />
-          <TrustBar items={trustBadges} />
-        </div>
-      </section>
+      <TrustJourney items={trustBadges} />
 
       <section id="services" className="mx-auto max-w-6xl px-6 py-28">
         <SectionHead
@@ -370,7 +360,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      <section id="meet-wulaimot" className="relative overflow-hidden bg-gradient-to-br from-lavender/[0.09] via-background to-sage/[0.12]">
+      <section id="meet-wulaimot" className="relative overflow-hidden">
         <Ambient className="-right-24 top-0 h-96 w-96 bg-lavender/20" duration={20} />
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-28 md:grid-cols-[5fr_6fr]">
           <Parallax className="relative mx-auto w-full max-w-md" distance={28}>
@@ -413,21 +403,9 @@ export default function HomePage() {
             </h2>
             <p className="mt-2 text-sm font-medium text-primary">MSN, APRN, PMHNP</p>
             <div className="mt-7 space-y-4 leading-relaxed text-muted-foreground">
-              <p>
-                Wulaimot Akindele is a board-certified Psychiatric Mental Health Nurse
-                Practitioner and the founder of WellSide Behavioral Health. She works with
-                adolescents and adults on the full range of what brings people to therapy,
-                from a specific diagnosis to simply not feeling like themselves lately.
-              </p>
-              <p>
-                Her practice focuses on psychiatric evaluations and medication management for
-                anxiety, depression, ADHD, PTSD, bipolar disorder, and other mood-related
-                concerns.
-              </p>
-              <p>
-                She built WellSide around one goal: make sure every patient feels heard in the
-                room, not rushed through it.
-              </p>
+              <ScrollText text="Wulaimot Akindele is a board-certified Psychiatric Mental Health Nurse Practitioner and the founder of WellSide Behavioral Health. She works with adolescents and adults on the full range of what brings people to therapy, from a specific diagnosis to simply not feeling like themselves lately." />
+              <ScrollText text="Her practice focuses on psychiatric evaluations and medication management for anxiety, depression, ADHD, PTSD, bipolar disorder, and other mood-related concerns." />
+              <ScrollText text="She built WellSide around one goal: make sure every patient feels heard in the room, not rushed through it." />
             </div>
             <div className="mt-9">
               <Link href="/book">
@@ -514,7 +492,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-sage/[0.12] to-background">
+      <section className="relative overflow-hidden">
         <Ambient className="-left-24 bottom-0 h-72 w-72 bg-gold/15" duration={21} />
         <div className="relative mx-auto max-w-5xl px-6 py-28">
           <SectionHead
@@ -616,7 +594,7 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      <section id="faq" className="bg-gradient-to-b from-background to-accent/60">
+      <section id="faq">
         <div className="mx-auto grid max-w-5xl gap-12 px-6 py-28 md:grid-cols-[2fr_3fr]">
           <Reveal className="md:sticky md:top-28 md:self-start">
             <Eyebrow>Questions</Eyebrow>
