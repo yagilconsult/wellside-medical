@@ -31,7 +31,7 @@ export function PortalSidebar({
             key={item.key}
             onClick={() => onSelect(item.key)}
             className={cn(
-              "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-left transition-colors shrink-0 whitespace-nowrap",
+              "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-left shrink-0 whitespace-nowrap outline-none transition-[transform,color,background-color] duration-150 ease-out active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-primary/40",
               isActive
                 ? "text-accent-foreground font-medium"
                 : "text-muted-foreground hover:bg-muted"
@@ -41,7 +41,7 @@ export function PortalSidebar({
               <motion.div
                 layoutId={layoutId}
                 className="absolute inset-0 rounded-lg bg-accent"
-                transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                transition={{ type: "spring", bounce: 0, duration: 0.3 }}
               />
             )}
             <Icon size={16} className="relative z-10" />

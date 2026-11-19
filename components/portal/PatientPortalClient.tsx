@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig, type Variants } from "framer-motion";
 import {
   LayoutDashboard,
   Calendar,
@@ -50,6 +50,26 @@ const navItems: PortalNavItem[] = [
   { key: "profile", label: "Profile", icon: User },
 ];
 
+// Motion: strong ease-out for entrances, springs without bounce for physical feedback,
+// exits faster than entrances. MotionConfig (below) swaps movement for fades when the
+// user prefers reduced motion.
+const easeOut = [0.23, 1, 0.32, 1] as const;
+const press = { type: "spring", bounce: 0, duration: 0.3 } as const;
+
+const stagger: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.055, delayChildren: 0.03 } },
+};
+const rise: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.34, ease: easeOut } },
+};
+const tabVariants: Variants = {
+  enter: (d: number) => ({ opacity: 0, y: 8 * d }),
+  center: { opacity: 1, y: 0, transition: { duration: 0.24, ease: easeOut } },
+  exit: (d: number) => ({ opacity: 0, y: -6 * d, transition: { duration: 0.12, ease: easeOut } }),
+};
+
 type Tone = "neutral" | "success" | "warning";
 
 const toneIcon: Record<Tone, string> = {
@@ -62,14 +82,17 @@ const toneIcon: Record<Tone, string> = {
 function DateBlock({ date, small = false }: { date: string; small?: boolean }) {
   const { month, day } = monthDay(date);
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", bounce: 0.25, duration: 0.45 }}
       className={`flex shrink-0 flex-col items-center justify-center rounded-xl bg-accent text-accent-foreground ${
         small ? "h-12 w-12" : "h-16 w-16"
       }`}
     >
       <span className={`font-medium uppercase tracking-wide ${small ? "text-[10px]" : "text-xs"}`}>{month}</span>
       <span className={`font-display font-semibold leading-none ${small ? "text-lg" : "text-2xl"}`}>{day}</span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -90,21 +113,30 @@ function StatusTile({
   onClick: () => void;
 }) {
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
-      className="group rounded-2xl border border-border bg-card p-4 text-left shadow-card transition-all duration-200 hover:shadow-card-hover active:scale-[0.98]"
+      variants={rise}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.97 }}
+      transition={press}
+      className="group rounded-2xl border border-border bg-card p-4 text-left shadow-card outline-none transition-shadow duration-200 hover:shadow-card-hover focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div className="mb-3 flex items-center justify-between">
-        <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${toneIcon[tone]}`}>
+        <div
+          className={`flex h-9 w-9 items-center justify-center rounded-xl transition-transform duration-200 ease-out group-hover:scale-110 ${toneIcon[tone]}`}
+        >
           <Icon size={17} />
         </div>
-        <ChevronRight size={16} className="text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight
+          size={16}
+          className="text-muted-foreground/50 transition-transform duration-200 ease-out group-hover:translate-x-0.5"
+        />
       </div>
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="font-display text-lg font-semibold leading-tight">{value}</p>
       <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>
-    </button>
+    </motion.button>
   );
 }
 
@@ -156,6 +188,13 @@ export function PatientPortalClient({
 }) {
   const router = useRouter();
   const [active, setActive] = useState("dashboard");
+  // Moving to a tab further down enters from below, and vice versa (spatial consistency).
+  const dirRef = useRef(1);
+  function selectTab(key: string) {
+    const order = navItems.map((n) => n.key);
+    dirRef.current = order.indexOf(key) >= order.indexOf(active) ? 1 : -1;
+    setActive(key);
+  }
   const [profileOpen, setProfileOpen] = useState(false);
   const [insuranceUploadOpen, setInsuranceUploadOpen] = useState(false);
   const [uploadCardFrontUrl, setUploadCardFrontUrl] = useState(insurance?.cardFrontUrl);
@@ -167,7 +206,8 @@ export function PatientPortalClient({
     month: "long",
     year: "numeric",
   });
-  const upcoming = appointments.find((a) => a.status === "CONFIRMED" || a.status === "REQUESTED");
+  const upcomingList = appointments.filter((a) => a.status === "CONFIRMED" || a.status === "REQUESTED");
+  const upcoming = upcomingList[0];
   const completed = appointments.filter((a) => a.status === "COMPLETED");
   const outstandingBalance = upcoming ? "$30.00" : "$0.00";
   const consentsComplete = ["HIPAA", "TELEHEALTH", "FINANCIAL"].every((t) =>
@@ -186,6 +226,7 @@ export function PatientPortalClient({
   }
 
   return (
+    <MotionConfig reducedMotion="user">
     <main className="mx-auto max-w-5xl px-6 py-8">
       <Toast message={message} />
 
@@ -219,9 +260,9 @@ export function PatientPortalClient({
             onClick={() => setInsuranceUploadOpen(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0, transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } }}
-              exit={{ opacity: 0, scale: 0.96, y: 6, transition: { duration: 0.12, ease: [0.4, 0, 1, 1] } }}
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0, transition: press }}
+              exit={{ opacity: 0, scale: 0.97, y: 4, transition: { duration: 0.12, ease: easeOut } }}
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-md rounded-2xl bg-card border border-border shadow-2xl p-6"
             >
@@ -267,23 +308,24 @@ export function PatientPortalClient({
       <PortalTopBar name={user.name} roleLabel="Patient" initials={initials} />
       <div className="flex flex-col md:flex-row gap-6 md:gap-8">
         <div className="flex flex-row md:flex-col justify-between md:h-full w-full md:w-40 md:shrink-0">
-          <PortalSidebar items={navItems} active={active} onSelect={setActive} />
+          <PortalSidebar items={navItems} active={active} onSelect={selectTab} />
           <div className="shrink-0 md:pt-4 md:mt-4 border-t-0 md:border-t border-border">
             <LogoutButton />
           </div>
         </div>
 
         <div className="flex-1 min-w-0">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" custom={dirRef.current}>
             <motion.div
               key={active}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              custom={dirRef.current}
+              variants={tabVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
             >
               {active === "dashboard" && (
-                <div className="space-y-4">
+                <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-4">
                   <PortalWelcomeCard
                     eyebrow="Patient portal"
                     greeting={`Welcome back, ${user.name.split(" ")[0]}`}
@@ -292,6 +334,7 @@ export function PatientPortalClient({
                   />
 
                   {!consentsComplete && (
+                    <motion.div variants={rise}>
                     <div className="flex flex-col gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 sm:flex-row sm:items-center">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-400">
                         <ClipboardCheck size={22} />
@@ -306,8 +349,10 @@ export function PatientPortalClient({
                         <Button size="sm" className="w-full sm:w-auto">Complete intake</Button>
                       </Link>
                     </div>
+                    </motion.div>
                   )}
 
+                  <motion.div variants={rise}>
                   <Card className="p-5">
                     <div className="mb-4 flex items-center justify-between">
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -337,15 +382,22 @@ export function PatientPortalClient({
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {upcoming.status === "CONFIRMED" && (
+                          {upcoming.status === "CONFIRMED" && relativeDay(upcoming.date) !== "Date passed" && (
                             <Link href={`/video/${upcoming.id}`} target="_blank">
                               <Button size="sm">
-                                <Video size={14} />
+                                {relativeDay(upcoming.date) === "Today" ? (
+                                  <span className="relative flex h-2 w-2">
+                                    <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75 animate-ping motion-reduce:animate-none" />
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-200" />
+                                  </span>
+                                ) : (
+                                  <Video size={14} />
+                                )}
                                 Join video visit
                               </Button>
                             </Link>
                           )}
-                          <Button size="sm" variant="secondary" onClick={() => setActive("appointments")}>
+                          <Button size="sm" variant="secondary" onClick={() => selectTab("appointments")}>
                             Manage
                           </Button>
                         </div>
@@ -365,8 +417,9 @@ export function PatientPortalClient({
                       </EmptyState>
                     )}
                   </Card>
+                  </motion.div>
 
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <motion.div variants={stagger} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <StatusTile
                       icon={ShieldCheck}
                       label="Insurance"
@@ -389,14 +442,14 @@ export function PatientPortalClient({
                           : "We'll confirm before your visit"
                       }
                       tone={insurance?.status === "VERIFIED" ? "success" : insurance ? "warning" : "neutral"}
-                      onClick={() => setActive("insurance")}
+                      onClick={() => selectTab("insurance")}
                     />
                     <StatusTile
                       icon={Wallet}
                       label="Balance"
                       value={outstandingBalance}
                       hint={upcoming ? "Due at your visit" : "Nothing due"}
-                      onClick={() => setActive("billing")}
+                      onClick={() => selectTab("billing")}
                     />
                     <StatusTile
                       icon={consentsComplete ? CheckCircle2 : ClipboardCheck}
@@ -404,10 +457,11 @@ export function PatientPortalClient({
                       value={consentsComplete ? "Complete" : "Incomplete"}
                       hint={consentsComplete ? "All forms signed" : "Action needed"}
                       tone={consentsComplete ? "success" : "warning"}
-                      onClick={() => setActive("documents")}
+                      onClick={() => selectTab("documents")}
                     />
-                  </div>
+                  </motion.div>
 
+                  <motion.div variants={rise}>
                   <Card className="p-5">
                     <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       Recent activity
@@ -432,7 +486,8 @@ export function PatientPortalClient({
                       </p>
                     )}
                   </Card>
-                </div>
+                  </motion.div>
+                </motion.div>
               )}
 
               {active === "appointments" && (
@@ -449,10 +504,15 @@ export function PatientPortalClient({
 
                   <div className="space-y-2">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Upcoming</p>
-                    {appointments
-                      .filter((a) => a.status === "CONFIRMED" || a.status === "REQUESTED")
-                      .map((a) => (
-                        <Card key={a.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+                    <AnimatePresence initial={false} mode="popLayout">
+                    {upcomingList.map((a) => (
+                      <motion.div
+                        key={a.id}
+                        layout
+                        transition={press}
+                        exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15, ease: easeOut } }}
+                      >
+                        <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
                           <DateBlock date={a.date} small />
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium">{a.type}</p>
@@ -464,7 +524,7 @@ export function PatientPortalClient({
                             </Badge>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {a.status === "CONFIRMED" && (
+                            {a.status === "CONFIRMED" && relativeDay(a.date) !== "Date passed" && (
                               <Link href={`/video/${a.id}`} target="_blank">
                                 <Button size="sm">
                                   <Video size={14} />
@@ -476,7 +536,7 @@ export function PatientPortalClient({
                               size="sm"
                               variant="secondary"
                               onClick={() => {
-                                setActive("messages");
+                                selectTab("messages");
                                 showToast("Message your provider with a time that works better");
                               }}
                             >
@@ -492,8 +552,10 @@ export function PatientPortalClient({
                             </Button>
                           </div>
                         </Card>
-                      ))}
-                    {appointments.filter((a) => a.status === "CONFIRMED" || a.status === "REQUESTED").length === 0 && (
+                      </motion.div>
+                    ))}
+                    </AnimatePresence>
+                    {upcomingList.length === 0 && (
                       <Card>
                         <EmptyState icon={CalendarPlus} title="No upcoming appointments" hint="Book a time whenever you're ready." />
                       </Card>
@@ -548,7 +610,9 @@ export function PatientPortalClient({
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-medium">
-                          {insurance ? `${insurance.company}${insurance.plan ? " " + insurance.plan : ""}` : "No insurance on file"}
+                          {insurance
+                            ? [insurance.company, insurance.plan].filter(Boolean).join(" ") || "Insurance card submitted"
+                            : "No insurance on file"}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {!insurance
@@ -669,5 +733,6 @@ export function PatientPortalClient({
         </div>
       </div>
     </main>
+    </MotionConfig>
   );
 }
